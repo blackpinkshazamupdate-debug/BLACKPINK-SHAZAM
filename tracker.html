@@ -12,9 +12,26 @@
   src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");
 }
 
-body{margin:0;background:black;color:white;font-family:"BPFont",sans-serif;}
-header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
-.updated{text-align:center;opacity:.7;margin-bottom:20px;}
+body{
+  margin:0;
+  background:black;
+  color:white;
+  font-family:"BPFont",sans-serif;
+  overflow-x:hidden;
+}
+
+header{
+  text-align:center;
+  padding:30px;
+  font-size:38px;
+  color:#ff2ea6;
+}
+
+.updated{
+  text-align:center;
+  opacity:.7;
+  margin-bottom:20px;
+}
 
 .song{
   display:flex;
@@ -26,17 +43,27 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   border-radius:10px;
   transition:.25s;
 }
-.song:hover{transform:scale(1.02);box-shadow:0 0 15px #ff2ea6;}
+.song:hover{
+  transform:scale(1.02);
+  box-shadow:0 0 15px #ff2ea6;
+}
 
 .rank{width:40px;font-size:18px;}
 .song img{width:50px;border-radius:6px;}
-
 .info{flex:1;}
 
-.bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
-.bar span{display:block;height:100%;background:#ff2ea6;}
-
-.total{font-size:12px;opacity:.7;margin-top:3px;}
+.bar{
+  height:6px;
+  background:#333;
+  margin-top:6px;
+  border-radius:5px;
+  overflow:hidden;
+}
+.bar span{
+  display:block;
+  height:100%;
+  background:#ff2ea6;
+}
 
 button{
   background:#ff2ea6;
@@ -47,10 +74,10 @@ button{
   cursor:pointer;
 }
 
-/* MILESTONE POPUP */
+/* POPUP */
 .milestone-popup{
   position:fixed;
-  bottom:20px;
+  bottom:30px;
   left:50%;
   transform:translateX(-50%);
   background:rgba(0,0,0,0.95);
@@ -59,6 +86,12 @@ button{
   z-index:9999;
   width:min(500px,95%);
   border:1px solid rgba(255,46,166,.5);
+  animation:fadeIn .4s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translate(-50%,20px);}
+  to{opacity:1; transform:translate(-50%,0);}
 }
 
 .milestone-popup h2{
@@ -75,7 +108,7 @@ button{
   height:55px;
   background-size:contain;
   background-repeat:no-repeat;
-  opacity:1;
+  will-change:transform, top, left;
 }
 </style>
 </head>
@@ -98,9 +131,7 @@ for(let i=100000;i<=5000000;i+=100000){
 
 function lastMilestone(v){
   let last=0
-  milestones.forEach(m=>{
-    if(v>=m) last=m
-  })
+  milestones.forEach(m=>{ if(v>=m) last=m })
   return last
 }
 
@@ -119,7 +150,7 @@ function milestoneText(v){
   return (v/1000)+"k"
 }
 
-/* ===== CONFETTI (FIXED) ===== */
+/* ===== ADVANCED CONFETTI ===== */
 function launchConfetti(){
 
   const images=[
@@ -128,33 +159,49 @@ function launchConfetti(){
     "images/bplogo.png"
   ]
 
-  for(let i=0;i<40;i++){
+  for(let i=0;i<50;i++){
+
     let c=document.createElement("div")
     c.className="confetti-piece"
-
-    c.style.left=Math.random()*window.innerWidth+"px"
-    c.style.top="-60px"
     c.style.backgroundImage=`url("${images[Math.floor(Math.random()*images.length)]}")`
+
+    let x=Math.random()*window.innerWidth
+    let y=-60
+    let drift=(Math.random()-0.5)*2
+    let speed=Math.random()*3+2
+    let rotate=Math.random()*360
+    let rotateSpeed=(Math.random()-0.5)*6
+
+    c.style.left=x+"px"
+    c.style.top=y+"px"
 
     document.body.appendChild(c)
     confettiActive.push(c)
 
-    let speed=Math.random()*3+2
-    function fall(){
+    function animate(){
       if(!document.body.contains(c)) return
-      c.style.top=(parseFloat(c.style.top)+speed)+"px"
-      if(parseFloat(c.style.top)<window.innerHeight+60){
-        requestAnimationFrame(fall)
+
+      y+=speed
+      x+=drift
+      rotate+=rotateSpeed
+
+      c.style.top=y+"px"
+      c.style.left=x+"px"
+      c.style.transform=`rotate(${rotate}deg)`
+
+      if(y<window.innerHeight+80){
+        requestAnimationFrame(animate)
+      } else {
+        c.remove()
       }
     }
-    requestAnimationFrame(fall)
+
+    requestAnimationFrame(animate)
   }
 }
 
 function stopConfetti(){
-  confettiActive.forEach(c=>{
-    c.remove()
-  })
+  confettiActive.forEach(c=>c.remove())
   confettiActive=[]
 }
 
@@ -162,16 +209,13 @@ function stopConfetti(){
 function checkMilestones(){
   let reached=[]
   songs.forEach(s=>{
-    if(s.Previous===null || s.Previous===undefined) return
-
+    if(s.Previous==null) return
     let oldMilestone=lastMilestone(s.Previous)
     let newMilestone=lastMilestone(s.Shazams)
-
     if(newMilestone>oldMilestone){
       reached.push(s)
     }
   })
-
   if(reached.length>0){
     showMilestonePopup(reached)
   }
@@ -179,6 +223,7 @@ function checkMilestones(){
 
 /* ===== POPUP ===== */
 function showMilestonePopup(list){
+
   launchConfetti()
 
   let pop=document.createElement("div")
@@ -192,6 +237,13 @@ function showMilestonePopup(list){
   "</ul><br><button onclick='closeMilestone(this)'>Close</button>"
 
   document.body.appendChild(pop)
+
+  setTimeout(()=>{
+    if(pop.parentNode){
+      pop.remove()
+      stopConfetti()
+    }
+  },20000)
 }
 
 function closeMilestone(btn){
@@ -202,7 +254,7 @@ function closeMilestone(btn){
 /* ===== BUILD UI ===== */
 function createSong(s,rank){
 
-  let increase = (s.Previous!=null) ? exact(s.Shazams - s.Previous) : "0"
+  let increase=(s.Previous!=null)? exact(s.Shazams-s.Previous) : "0"
 
   let div=document.createElement("div")
   div.className="song"
@@ -212,21 +264,20 @@ function createSong(s,rank){
     <img src="images/${s.ImageFile}">
     <div class="info">
       ${s.Song}
-      <div class="total">${exact(s.Shazams)} Shazams</div>
+      <div style="font-size:12px;opacity:.7;">${exact(s.Shazams)} Shazams</div>
       <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-      <div style="font-size:12px;opacity:.7;">+${increase} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
+      <div style="font-size:12px;opacity:.7;">
+        +${increase} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}
+      </div>
     </div>
   `
-
   return div
 }
 
 function build(){
   let c=document.getElementById("content")
   c.innerHTML=""
-
   let sorted=[...songs].sort((a,b)=>b.Shazams-a.Shazams)
-
   sorted.forEach((s,i)=>{
     c.appendChild(createSong(s,i+1))
   })
@@ -238,12 +289,9 @@ Papa.parse("blackpink.csv",{
   header:true,
   dynamicTyping:true,
   complete:function(res){
-
     songs=res.data.filter(x=>x.Song)
-
     build()
     checkMilestones()
-
     document.getElementById("updated").innerText=
       "Last Updated: "+songs[0]["Last Update"]
   }
