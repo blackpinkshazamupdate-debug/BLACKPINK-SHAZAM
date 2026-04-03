@@ -110,6 +110,26 @@ button{
   background-repeat:no-repeat;
   will-change:transform, top, left;
 }
+
+/* BP LOGO GLOW */
+.bp-glow{
+  filter: drop-shadow(0 0 8px #ff2ea6)
+          drop-shadow(0 0 16px #ff2ea6)
+          drop-shadow(0 0 24px #ff66cc);
+  animation: glowPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes glowPulse{
+  0%{ filter:
+      drop-shadow(0 0 6px #ff2ea6)
+      drop-shadow(0 0 12px #ff2ea6); }
+  50%{ filter:
+      drop-shadow(0 0 14px #ff66cc)
+      drop-shadow(0 0 28px #ff2ea6); }
+  100%{ filter:
+      drop-shadow(0 0 6px #ff2ea6)
+      drop-shadow(0 0 12px #ff2ea6); }
+}
 </style>
 </head>
 <body>
@@ -150,7 +170,7 @@ function milestoneText(v){
   return (v/1000)+"k"
 }
 
-/* ===== ADVANCED CONFETTI ===== */
+/* CONFETTI */
 function launchConfetti(){
 
   const images=[
@@ -163,7 +183,14 @@ function launchConfetti(){
 
     let c=document.createElement("div")
     c.className="confetti-piece"
-    c.style.backgroundImage=`url("${images[Math.floor(Math.random()*images.length)]}")`
+
+    let chosen=images[Math.floor(Math.random()*images.length)]
+    c.style.backgroundImage=`url("${chosen}")`
+
+    // ADD GLOW ONLY TO BP LOGO
+    if(chosen.includes("bplogo")){
+      c.classList.add("bp-glow")
+    }
 
     let x=Math.random()*window.innerWidth
     let y=-60
@@ -205,7 +232,6 @@ function stopConfetti(){
   confettiActive=[]
 }
 
-/* ===== MILESTONE CHECK ===== */
 function checkMilestones(){
   let reached=[]
   songs.forEach(s=>{
@@ -221,7 +247,6 @@ function checkMilestones(){
   }
 }
 
-/* ===== POPUP ===== */
 function showMilestonePopup(list){
 
   launchConfetti()
@@ -251,7 +276,6 @@ function closeMilestone(btn){
   stopConfetti()
 }
 
-/* ===== BUILD UI ===== */
 function createSong(s,rank){
 
   let increase=(s.Previous!=null)? exact(s.Shazams-s.Previous) : "0"
@@ -283,7 +307,6 @@ function build(){
   })
 }
 
-/* ===== LOAD CSV ===== */
 Papa.parse("blackpink.csv",{
   download:true,
   header:true,
