@@ -1,143 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>BLACKPINK Shazam Tracker</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-
-<style>
-@font-face{
-  font-family:"BPFont";
-  src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");
-}
-
-body{
-  margin:0;
-  background:black;
-  color:white;
-  font-family:"BPFont",sans-serif;
-  overflow-x:hidden;
-}
-
-header{
-  text-align:center;
-  padding:30px;
-  font-size:38px;
-  color:#ff2ea6;
-}
-
-.updated{
-  text-align:center;
-  opacity:.7;
-  margin-bottom:20px;
-}
-
-.song{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:10px;
-  margin:8px 20px;
-  background:rgba(0,0,0,.6);
-  border-radius:10px;
-  transition:.25s;
-}
-.song:hover{
-  transform:scale(1.02);
-  box-shadow:0 0 15px #ff2ea6;
-}
-
-.rank{width:40px;font-size:18px;}
-.song img{width:50px;border-radius:6px;}
-.info{flex:1;}
-
-.bar{
-  height:6px;
-  background:#333;
-  margin-top:6px;
-  border-radius:5px;
-  overflow:hidden;
-}
-.bar span{
-  display:block;
-  height:100%;
-  background:#ff2ea6;
-}
-
-button{
-  background:#ff2ea6;
-  border:none;
-  color:white;
-  padding:6px 10px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-/* POPUP */
-.milestone-popup{
-  position:fixed;
-  bottom:30px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.95);
-  padding:20px 25px;
-  border-radius:14px;
-  z-index:9999;
-  width:min(500px,95%);
-  border:1px solid rgba(255,46,166,.5);
-  animation:fadeIn .4s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translate(-50%,20px);}
-  to{opacity:1; transform:translate(-50%,0);}
-}
-
-.milestone-popup h2{
-  margin:0 0 10px 0;
-  color:#ff2ea6;
-}
-
-/* CONFETTI */
-.confetti-piece{
-  position:fixed;
-  pointer-events:none;
-  z-index:10000;
-  width:55px;
-  height:55px;
-  background-size:contain;
-  background-repeat:no-repeat;
-  will-change:transform, top, left;
-}
-
-/* BP LOGO GLOW */
-.bp-glow{
-  filter: drop-shadow(0 0 8px #ff2ea6)
-          drop-shadow(0 0 16px #ff2ea6)
-          drop-shadow(0 0 24px #ff66cc);
-  animation: glowPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes glowPulse{
-  0%{ filter:
-      drop-shadow(0 0 6px #ff2ea6)
-      drop-shadow(0 0 12px #ff2ea6); }
-  50%{ filter:
-      drop-shadow(0 0 14px #ff66cc)
-      drop-shadow(0 0 28px #ff2ea6); }
-  100%{ filter:
-      drop-shadow(0 0 6px #ff2ea6)
-      drop-shadow(0 0 12px #ff2ea6); }
-}
-</style>
-</head>
-<body>
-
-<header>BLACKPINK Shazam Tracker</header>
-<div class="updated" id="updated"></div>
-<div id="content"></div>
-
 <script>
 let songs=[]
 let confettiActive=[]
@@ -145,32 +5,15 @@ let confettiActive=[]
 function exact(n){ return Number(n||0).toLocaleString() }
 
 const milestones=[]
-for(let i=100000;i<=5000000;i+=100000){
-  milestones.push(i)
-}
+for(let i=100000;i<=5000000;i+=100000){ milestones.push(i) }
 
-function lastMilestone(v){
-  let last=0
-  milestones.forEach(m=>{ if(v>=m) last=m })
-  return last
-}
+function nextMilestone(v){ return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000 }
+function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }); return last }
+function progress(v){ let prev=lastMilestone(v); let next=nextMilestone(v); return Math.floor(((v-prev)/(next-prev))*100) }
+function milestoneText(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; return (v/1000)+"k" }
 
-function nextMilestone(v){
-  return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000
-}
+/* ================= CONFETTI ================= */
 
-function progress(v){
-  let prev=lastMilestone(v)
-  let next=nextMilestone(v)
-  return Math.floor(((v-prev)/(next-prev))*100)
-}
-
-function milestoneText(v){
-  if(v>=1000000) return (v/1000000).toFixed(1)+"M"
-  return (v/1000)+"k"
-}
-
-/* CONFETTI */
 function launchConfetti(){
 
   const images=[
@@ -179,7 +22,7 @@ function launchConfetti(){
     "images/bplogo.png"
   ]
 
-  for(let i=0;i<50;i++){
+  for(let i=0;i<45;i++){
 
     let c=document.createElement("div")
     c.className="confetti-piece"
@@ -187,9 +30,9 @@ function launchConfetti(){
     let chosen=images[Math.floor(Math.random()*images.length)]
     c.style.backgroundImage=`url("${chosen}")`
 
-    // ADD GLOW ONLY TO BP LOGO
+    // Glow for BP logo
     if(chosen.includes("bplogo")){
-      c.classList.add("bp-glow")
+      c.style.filter="drop-shadow(0 0 8px #ff2ea6) drop-shadow(0 0 18px #ff2ea6)"
     }
 
     let x=Math.random()*window.innerWidth
@@ -197,7 +40,7 @@ function launchConfetti(){
     let drift=(Math.random()-0.5)*2
     let speed=Math.random()*3+2
     let rotate=Math.random()*360
-    let rotateSpeed=(Math.random()-0.5)*6
+    let rotateSpeed=(Math.random()-0.5)*5
 
     c.style.left=x+"px"
     c.style.top=y+"px"
@@ -232,13 +75,15 @@ function stopConfetti(){
   confettiActive=[]
 }
 
+/* ================= MILESTONE ================= */
+
 function checkMilestones(){
   let reached=[]
   songs.forEach(s=>{
     if(s.Previous==null) return
-    let oldMilestone=lastMilestone(s.Previous)
-    let newMilestone=lastMilestone(s.Shazams)
-    if(newMilestone>oldMilestone){
+    let oldM=lastMilestone(s.Previous)
+    let newM=lastMilestone(s.Shazams)
+    if(newM>oldM){
       reached.push(s)
     }
   })
@@ -248,18 +93,18 @@ function checkMilestones(){
 }
 
 function showMilestonePopup(list){
+  if(list.length===0) return
 
   launchConfetti()
 
   let pop=document.createElement("div")
   pop.className="milestone-popup"
-
   pop.innerHTML=
-  "<h2>Milestone Achievements</h2><ul>"+
-  list.map(s=>
-    `<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`
-  ).join("")+
-  "</ul><br><button onclick='closeMilestone(this)'>Close</button>"
+    "<h2>Milestone Achievements</h2><ul>"+
+    list.map(s=>
+      `<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`
+    ).join("")+
+    "</ul><button onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
 
   document.body.appendChild(pop)
 
@@ -271,41 +116,23 @@ function showMilestonePopup(list){
   },20000)
 }
 
-function closeMilestone(btn){
-  btn.parentNode.remove()
-  stopConfetti()
-}
-
-function createSong(s,rank){
-
-  let increase=(s.Previous!=null)? exact(s.Shazams-s.Previous) : "0"
-
-  let div=document.createElement("div")
-  div.className="song"
-
-  div.innerHTML=`
-    <div class="rank">${rank}</div>
-    <img src="images/${s.ImageFile}">
-    <div class="info">
-      ${s.Song}
-      <div style="font-size:12px;opacity:.7;">${exact(s.Shazams)} Shazams</div>
-      <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-      <div style="font-size:12px;opacity:.7;">
-        +${increase} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}
-      </div>
-    </div>
-  `
-  return div
-}
+/* ================= BUILD ================= */
 
 function build(){
   let c=document.getElementById("content")
   c.innerHTML=""
-  let sorted=[...songs].sort((a,b)=>b.Shazams-a.Shazams)
-  sorted.forEach((s,i)=>{
-    c.appendChild(createSong(s,i+1))
+
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+  c.appendChild(createSection("GLOBAL TOP 10",top))
+
+  let sections=[...new Set(songs.map(s=>s.Section))]
+  sections.forEach(sec=>{
+    if(sec!=="GLOBAL TOP 10")
+      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
   })
 }
+
+/* ================= CSV LOAD ================= */
 
 Papa.parse("blackpink.csv",{
   download:true,
@@ -314,12 +141,9 @@ Papa.parse("blackpink.csv",{
   complete:function(res){
     songs=res.data.filter(x=>x.Song)
     build()
-    checkMilestones()
+    checkMilestones()   // ← THIS was missing before
     document.getElementById("updated").innerText=
       "Last Updated: "+songs[0]["Last Update"]
   }
 })
 </script>
-
-</body>
-</html>
