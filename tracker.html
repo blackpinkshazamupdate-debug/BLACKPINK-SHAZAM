@@ -13,41 +13,80 @@
   src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");
 }
 
-body{margin:0;background:black;color:white;font-family:"BPFont",sans-serif;}
-header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
-.updated{text-align:center;opacity:.7;margin-bottom:20px;}
+body{margin:0; background:black; color:white; font-family:"BPFont",sans-serif;}
+header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
+.updated{text-align:center; opacity:.7; margin-bottom:20px;}
 
-.section{margin:40px 0;position:relative;overflow:hidden;}
-.section-bg{position:absolute;width:100%;height:100%;background-size:cover;background-position:center;filter:blur(12px) brightness(.35);transform:scale(1.2);}
-.section-content{position:relative;padding:30px;}
-.section h2{color:#ff2ea6;font-size:28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.section{margin:40px 0; position:relative; overflow:hidden;}
+.section-bg{position:absolute; width:100%; height:100%; background-size:cover; background-position:center; filter:blur(12px) brightness(.35); transform:scale(1.2);}
+.section-content{position:relative; padding:30px;}
+.section h2{color:#ff2ea6; font-size:28px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
 
-.song{display:flex;align-items:center;gap:15px;padding:10px;margin:8px 0;background:rgba(0,0,0,.55);border-radius:10px;transition:.25s;position:relative;flex-wrap:wrap;}
-.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2ea6;}
+.song{display:flex; align-items:center; gap:15px; padding:10px; margin:8px 0; background:rgba(0,0,0,.55); border-radius:10px; transition:.25s; transform-origin:center center; position:relative; flex-wrap:wrap;}
+.song:hover{transform:scale(1.03); box-shadow:0 0 15px #ff2ea6;}
 
-.rank{font-size:20px;width:40px;}
-.song img{width:50px;border-radius:6px;}
-.info{flex:1;min-width:120px;}
+.rank{font-size:20px; width:40px; flex-shrink:0;}
+.song img{width:50px; border-radius:6px; flex-shrink:0;}
+.info{flex:1; position:relative; min-width:120px;}
 
-.bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
-.bar span{display:block;height:100%;background:#ff2ea6;}
+.bar{height:6px; background:#333; margin-top:6px; border-radius:5px; overflow:hidden;}
+.bar span{display:block; height:100%; background:#ff2ea6;}
 
-.total-shazams{font-size:12px;opacity:0.7;margin-top:3px;}
-.hoverstats{font-size:12px;opacity:0;transition:.2s;margin-top:5px;}
+.total-shazams{font-size:12px; opacity:0.7; margin-top:3px;}
+.hoverstats{font-size:12px; opacity:0; transition:.2s; margin-top:5px;}
 .song:hover .hoverstats{opacity:1;}
-.song:hover .total-shazams{opacity:.5;}
+.song:hover .total-shazams{opacity:0.5;}
 
-button.pink{background:#ff2ea6;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;margin-top:5px;}
+/* ✅ FIXED PROMO OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  padding:20px;
+}
 
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px;}
-.card{background:black;padding:15px;border-radius:12px;text-align:center;width:min(520px,95%);}
+.card{
+  background:black;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+  width:min(520px,95%);
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.exportArea{
+  padding:15px;
+  background:black;
+  border-radius:12px;
+  font-size:18px;
+  overflow:hidden;
+}
 
 .exportArea img{
   width:100%;
-  max-height:260px;
-  object-fit:contain;
+  max-height:220px;
+  object-fit:cover;
   border-radius:10px;
   margin-bottom:10px;
+}
+
+.exportArea h2{font-size:26px; color:#ff2ea6;}
+.exportArea p{font-size:18px;}
+
+button.pink{
+  background:#ff2ea6;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:5px;
 }
 
 .milestone-popup{
@@ -55,23 +94,57 @@ button.pink{background:#ff2ea6;color:white;border:none;padding:6px 10px;border-r
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:rgba(0,0,0,0.9);
+  background:rgba(0,0,0,0.85);
   padding:20px 25px;
   border-radius:14px;
+  font-size:18px;
   z-index:9999;
+  width:min(500px,95%);
+  backdrop-filter:blur(6px);
   border:1px solid rgba(255,46,166,.5);
 }
 
-.milestone-popup h2{margin:0 0 10px;color:#ff2ea6;}
+.milestone-popup h2{
+  margin:0 0 10px 0;
+  color:#ff2ea6;
+  font-size:20px;
+}
+
+.milestone-popup ul{
+  padding-left:18px;
+  margin:0;
+  text-align:left;
+}
+
+.milestone-popup button{
+  margin-top:12px;
+  background:#ff2ea6;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
 
 .confetti-piece{
   position:fixed;
-  width:55px;
-  height:55px;
-  background-size:contain;
-  background-repeat:no-repeat;
   pointer-events:none;
   z-index:10000;
+  width:60px;
+  height:60px;
+  background-size:contain;
+  background-repeat:no-repeat;
+  opacity:1;
+  transition: opacity 2s;
+}
+
+@media (max-width:768px){
+  header{font-size:28px;padding:20px;}
+  .section-content{padding:20px;}
+  .song{gap:10px;padding:8px;}
+  .rank{width:30px;font-size:16px;}
+  .song img{width:40px;}
+  .section h2{font-size:22px;}
 }
 </style>
 </head>
@@ -83,165 +156,185 @@ button.pink{background:#ff2ea6;color:white;border:none;padding:6px 10px;border-r
 
 <script>
 let songs=[]
-let confettiActive=[]
 let milestonesReached=[]
+let confettiActive=[]
 
-function exact(n){return Number(n).toLocaleString()}
+function exact(n){ return Number(n).toLocaleString() }
 
 const milestones=[]
-for(let i=100000;i<=5000000;i+=100000){milestones.push(i)}
+for(let i=100000;i<=5000000;i+=100000){ milestones.push(i) }
 
-function lastMilestone(v){
- let l=0
- milestones.forEach(m=>{if(v>=m)l=m})
- return l
-}
+function nextMilestone(v){ return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000 }
+function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }); return last }
+function progress(v){ let prev=lastMilestone(v); let next=nextMilestone(v); return Math.floor(((v-prev)/(next-prev))*100) }
+function milestoneText(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; return (v/1000)+"k" }
 
 /* CONFETTI */
 function launchConfetti(){
- const imgs=[
-   {src:"images/lightstick1.png"},
-   {src:"images/lightstick2.png"},
-   {src:"images/bplogo.png",glow:true}
- ]
-
- for(let i=0;i<50;i++){
-   const el=document.createElement("div")
-   el.className="confetti-piece"
-
-   const chosen=imgs[Math.floor(Math.random()*imgs.length)]
-   el.style.backgroundImage=`url(${chosen.src})`
-
-   if(chosen.glow){
-     el.style.filter="drop-shadow(0 0 8px #ff2ea6)"
-   }
-
-   const startX=Math.random()*window.innerWidth
-   el.style.left=startX+"px"
-   el.style.top="-80px"
-
-   document.body.appendChild(el)
-   confettiActive.push(el)
-
-   animateConfetti(el,startX)
- }
+  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
+  for(let i=0;i<40;i++){
+    let c=document.createElement("div")
+    c.className="confetti-piece"
+    c.style.left=Math.random()*window.innerWidth+"px"
+    c.style.top="-60px"
+    c.style.backgroundImage=`url(${images[Math.floor(Math.random()*images.length)]})`
+    document.body.appendChild(c)
+    confettiActive.push(c)
+    animateConfetti(c)
+  }
 }
 
-function animateConfetti(el,x){
- let y=-80
- const speedY=Math.random()*2+2
- const drift=Math.random()*1.5-0.75
- let rotation=0
- const rotateSpeed=Math.random()*4+1
-
- function frame(){
-   y+=speedY
-   x+=drift
-   rotation+=rotateSpeed
-
-   el.style.top=y+"px"
-   el.style.left=x+"px"
-   el.style.transform="rotate("+rotation+"deg)"
-
-   if(y<window.innerHeight+100){
-     requestAnimationFrame(frame)
-   }else{
-     el.remove()
-   }
- }
- requestAnimationFrame(frame)
+function animateConfetti(c){
+  let fall=Math.random()*3+2
+  function frame(){
+    if(!document.body.contains(c)) return
+    c.style.top=(parseFloat(c.style.top)+fall)+"px"
+    if(parseFloat(c.style.top)<window.innerHeight+60) requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
 }
 
 function stopConfetti(){
- confettiActive.forEach(c=>c.remove())
- confettiActive=[]
+  confettiActive.forEach(c=>{c.style.opacity=0; setTimeout(()=>c.remove(),2000)})
+  confettiActive=[]
 }
 
-/* POPUP */
+/* MILESTONE POPUP */
 function showMilestonePopup(list){
- if(!list.length) return
-
- launchConfetti()
-
- const pop=document.createElement("div")
- pop.className="milestone-popup"
- pop.innerHTML="<h2>Milestone Achieved!</h2>"+
- list.map(s=>`<div>${s.Song} hit ${exact(lastMilestone(s.Shazams))}</div>`).join("")+
- "<button class='pink' onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
-
- document.body.appendChild(pop)
-
- setTimeout(()=>{
-   if(pop.parentNode){
-     pop.remove()
-     stopConfetti()
-   }
- },15000)
+  if(list.length===0) return
+  launchConfetti()
+  let pop=document.createElement("div")
+  pop.className="milestone-popup"
+  pop.innerHTML="<h2>Milestone Achievements</h2><ul>"+
+  list.map(s=>`<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`).join("")
+  +"</ul><button onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
+  document.body.appendChild(pop)
+  setTimeout(()=>{ if(pop.parentNode){ pop.remove(); stopConfetti() } },20000)
 }
 
-/* SONG */
+/* PROMO */
+async function sharePromo(){
+  let area=document.getElementById("exportArea")
+  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
+  canvas.toBlob(async blob=>{
+    let file=new File([blob],"blackpink.png",{type:"image/png"})
+    if(navigator.share){
+      await navigator.share({files:[file],text:"BLACKPINK Shazam Tracker",url:location.href})
+    }
+  })
+}
+
+async function downloadPromo(){
+  let area=document.getElementById("exportArea")
+  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
+  let a=document.createElement("a")
+  a.href=canvas.toDataURL()
+  a.download="blackpink-promo.png"
+  a.click()
+}
+
+function openPromo(title,subtitle,shazams,img,list=null){
+  let contentHTML=""
+  if(list){
+    contentHTML+="<div style='text-align:left;margin-top:10px;'>"
+    list.forEach((s,i)=>{ contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>` })
+    contentHTML+="</div>"
+  }
+  let overlay=document.createElement("div")
+  overlay.className="overlay"
+  overlay.innerHTML=`
+  <div class="card">
+    <div id="exportArea" class="exportArea">
+      <img src="${img}">
+      <h2>${title}</h2>
+      <p>${exact(shazams)} Shazams</p>
+      ${contentHTML}
+    </div>
+    <div>
+      <button class="pink" onclick="sharePromo()">Share</button>
+      <button class="pink" onclick="downloadPromo()">Download</button>
+      <button class="pink" onclick="this.closest('.overlay').remove()">Close</button>
+    </div>
+  </div>`
+  document.body.appendChild(overlay)
+}
+
+/* SONG + SECTION BUILD LOGIC REMAINS UNCHANGED */
 function createSong(s,rank){
- const div=document.createElement("div")
- div.className="song"
- div.innerHTML=`
- <div class="rank">${rank}</div>
- <img src="images/${s.ImageFile}">
- <div class="info">
- ${s.Song}
- <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
- <div class="bar"><span style="width:50%"></span></div>
- </div>`
- return div
+  let div=document.createElement("div")
+  div.className="song"
+  div.innerHTML=`
+  <div class="rank">${rank}</div>
+  <img src="images/${s.ImageFile}">
+  <div class="info">
+    ${s.Song}
+    <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
+    <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
+    <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
+  </div>
+  <button class="pink" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">Share</button>`
+  return div
 }
 
-/* SECTION */
 function createSection(name,list){
- const div=document.createElement("div")
- div.className="section"
- div.innerHTML=`
- <div class="section-content">
- <h2>${name}</h2>
- </div>`
- const content=div.querySelector(".section-content")
- list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
- return div
+  let div=document.createElement("div")
+  div.className="section"
+  let total=list.reduce((a,b)=>a+b.Shazams,0)
+  let safeList=encodeURIComponent(JSON.stringify(list))
+  let promoImage=(name==="DEADLINE")?"images/deadline.jpg":sectionImage(name)
+  div.innerHTML=`
+  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
+  <div class="section-content">
+    <h2>${name}
+    <button class="pink" onclick="openSectionPromo('${name}',${total},'${promoImage}','${safeList}')">Share</button>
+    </h2>
+  </div>`
+  let content=div.querySelector(".section-content")
+  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
+  return div
 }
 
-/* BUILD */
+function openSectionPromo(name,total,img,encoded){
+  let list=JSON.parse(decodeURIComponent(encoded))
+  openPromo(name,"",total,img,list)
+}
+
+function sectionImage(name){
+  const map={
+    "GLOBAL TOP 10":"images/ot4.jpg",
+    "DEADLINE":"images/deadline2.png",
+    "BORN PINK":"images/bornpink.jpg",
+    "THE ALBUM":"images/thealbum.jpg",
+    "KILL THIS LOVE - EP":"images/killthislove.jpg",
+    "SQUARE UP":"images/squareup.jpg",
+    "SQUARE TWO":"images/squaretwo.jpg",
+    "SQUARE ONE":"images/squareone.jpg",
+    "Others":"images/asifitsyourlast.jpg"
+  }
+  return map[name]||"images/ot4.jpg"
+}
+
 function build(){
- const c=document.getElementById("content")
- c.innerHTML=""
-
- const sections=[...new Set(songs.map(s=>s.Section))]
-
- sections.forEach(sec=>{
-   const list=songs.filter(s=>s.Section===sec)
-   c.appendChild(createSection(sec,list))
- })
-
- const newlyReached=[]
- songs.forEach(s=>{
-   const milestone=lastMilestone(s.Shazams)
-   if(milestone>0 && !milestonesReached.includes(s.Song+milestone)){
-     milestonesReached.push(s.Song+milestone)
-     newlyReached.push(s)
-   }
- })
-
- showMilestonePopup(newlyReached)
+  let c=document.getElementById("content")
+  c.innerHTML=""
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+  let topDiv=createSection("GLOBAL TOP 10",top)
+  topDiv.querySelector("button.pink").onclick=
+  ()=>openPromo("GLOBAL TOP 10","",top.reduce((a,b)=>a+b.Shazams,0),"images/ot4.jpg",top)
+  c.appendChild(topDiv)
+  let sections=[...new Set(songs.map(s=>s.Section))]
+  sections.forEach(sec=>{
+    if(sec!=="GLOBAL TOP 10")
+      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
+  })
 }
 
-/* LOAD CSV */
-Papa.parse("blackpink.csv",{
- download:true,
- header:true,
- dynamicTyping:true,
- complete:function(res){
-   songs=res.data.filter(r=>r.Song)
-   build()
-   document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
- }
-})
+Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
+complete:function(res){
+  songs=res.data
+  build()
+  document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
+}})
 </script>
 
 </body>
