@@ -77,8 +77,8 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 
 .card{
   background:black;
-  padding:15px;
-  border-radius:12px;
+  padding:20px;
+  border-radius:16px;
   text-align:center;
   width:min(520px,95%);
   max-height:90vh;
@@ -95,7 +95,8 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 }
 
 .exportArea img{
-  width:100%;
+  width:auto;
+  max-width:100%;
   height:auto;
   max-height:260px;
   object-fit:contain;
@@ -131,6 +132,18 @@ button.pink{
   border:1px solid rgba(255,46,166,.5);
 }
 
+.milestone-popup h2{
+  margin:0 0 10px 0;
+  color:#ff2ea6;
+  font-size:20px;
+}
+
+.milestone-popup ul{
+  padding-left:18px;
+  margin:0;
+  text-align:left;
+}
+
 .confetti-piece{
   position:fixed;
   pointer-events:none;
@@ -140,17 +153,9 @@ button.pink{
   background-size:contain;
   background-repeat:no-repeat;
   opacity:1;
-  transition: opacity 2s;
+  transition:opacity 2s;
 }
 
-@media (max-width:768px){
-  header{font-size:28px;padding:20px;}
-  .section-content{padding:20px;}
-  .song{gap:10px;padding:8px;}
-  .rank{width:30px;font-size:16px;}
-  .song img{width:40px;}
-  .section h2{font-size:22px;}
-}
 </style>
 </head>
 
@@ -164,6 +169,7 @@ button.pink{
 
 let songs=[]
 let confettiActive=[]
+let milestoneTriggered=false
 
 function exact(n){ return Number(n).toLocaleString() }
 
@@ -172,15 +178,7 @@ for(let i=100000;i<=5000000;i+=100000){ milestones.push(i) }
 
 function nextMilestone(v){ return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000 }
 function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }); return last }
-function progress(v){
-  let prev=lastMilestone(v)
-  let next=nextMilestone(v)
-  return Math.floor(((v-prev)/(next-prev))*100)
-}
-function milestoneText(v){
-  if(v>=1000000) return (v/1000000).toFixed(1)+"M"
-  return (v/1000)+"k"
-}
+function milestoneText(v){ return v>=1000000 ? (v/1000000).toFixed(1)+"M" : (v/1000)+"k" }
 
 /* CONFETTI */
 function launchConfetti(){
@@ -196,6 +194,7 @@ function launchConfetti(){
     animateConfetti(c)
   }
 }
+
 function animateConfetti(c){
   let fall=Math.random()*3+2
   function frame(){
@@ -205,12 +204,28 @@ function animateConfetti(c){
   }
   requestAnimationFrame(frame)
 }
+
 function stopConfetti(){
   confettiActive.forEach(c=>{
     c.style.opacity=0
     setTimeout(()=>c.remove(),2000)
   })
   confettiActive=[]
+}
+
+/* MILESTONE POPUP */
+function showMilestonePopup(list){
+  if(list.length===0) return
+  launchConfetti()
+
+  let pop=document.createElement("div")
+  pop.className="milestone-popup"
+  pop.innerHTML="<h2>Milestone Achievements</h2><ul>"+
+  list.map(s=>`<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`).join("")
+  +"</ul><button onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
+
+  document.body.appendChild(pop)
+  setTimeout(()=>{ if(pop.parentNode){ pop.remove(); stopConfetti() } },20000)
 }
 
 /* SHARE */
@@ -220,11 +235,7 @@ async function sharePromo(){
   canvas.toBlob(async blob=>{
     let file=new File([blob],"blackpink.png",{type:"image/png"})
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({
-        files:[file],
-        text:"BLACKPINK Shazam Tracker",
-        url:location.href
-      })
+      await navigator.share({files:[file],text:"BLACKPINK Shazam Tracker"})
     }else{
       let a=document.createElement("a")
       a.href=URL.createObjectURL(blob)
@@ -243,16 +254,7 @@ async function downloadPromo(){
   a.click()
 }
 
-function openPromo(title,subtitle,shazams,img,list=null){
-  let contentHTML=""
-  if(list){
-    contentHTML+="<div style='text-align:left;margin-top:10px;'>"
-    list.forEach((s,i)=>{
-      contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>`
-    })
-    contentHTML+="</div>"
-  }
-
+function openPromo(title,subtitle,shazams,img){
   let overlay=document.createElement("div")
   overlay.className="overlay"
   overlay.innerHTML=`
@@ -261,7 +263,6 @@ function openPromo(title,subtitle,shazams,img,list=null){
       <img src="${img}">
       <h2>${title}</h2>
       <p>${exact(shazams)} Shazams</p>
-      ${contentHTML}
     </div>
     <div>
       <button class="pink" onclick="sharePromo()">Share</button>
@@ -272,6 +273,7 @@ function openPromo(title,subtitle,shazams,img,list=null){
   document.body.appendChild(overlay)
 }
 
+/* BUILD */
 function createSong(s,rank){
   let div=document.createElement("div")
   div.className="song"
@@ -281,43 +283,8 @@ function createSong(s,rank){
   <div class="info">
     ${s.Song}
     <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
-    <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-    <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
   </div>
   <button class="pink" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">Share</button>`
-  return div
-}
-
-function sectionImage(name){
-  const map={
-    "GLOBAL TOP 10":"images/ot4.jpg",
-    "DEADLINE":"images/deadline2.png",
-    "BORN PINK":"images/bornpink.jpg",
-    "THE ALBUM":"images/thealbum.jpg",
-    "KILL THIS LOVE - EP":"images/killthislove.jpg",
-    "SQUARE UP":"images/squareup.jpg",
-    "SQUARE TWO":"images/squaretwo.jpg",
-    "SQUARE ONE":"images/squareone.jpg",
-    "Others":"images/asifitsyourlast.jpg"
-  }
-  return map[name]||"images/ot4.jpg"
-}
-
-function createSection(name,list){
-  let div=document.createElement("div")
-  div.className="section"
-  let total=list.reduce((a,b)=>a+b.Shazams,0)
-
-  div.innerHTML=`
-  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
-  <div class="section-content">
-    <h2>${name}
-    <button class="pink" onclick='openPromo("${name}","",${total},"${sectionImage(name)}",${JSON.stringify(list)})'>Share</button>
-    </h2>
-  </div>`
-
-  let content=div.querySelector(".section-content")
-  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
   return div
 }
 
@@ -326,21 +293,23 @@ function build(){
   c.innerHTML=""
 
   let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
-  c.appendChild(createSection("GLOBAL TOP 10",top))
+  let section=document.createElement("div")
+  section.className="section"
+  section.innerHTML=`<div class="section-content"><h2>GLOBAL TOP 10</h2></div>`
+  let content=section.querySelector(".section-content")
+  top.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
+  c.appendChild(section)
 
-  let sections=[...new Set(songs.map(s=>s.Section))]
-  sections.forEach(sec=>{
-    if(sec!=="GLOBAL TOP 10")
-      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
-  })
+  if(!milestoneTriggered){
+    let reached=songs.filter(s=>milestones.includes(lastMilestone(s.Shazams)))
+    if(reached.length>0){
+      milestoneTriggered=true
+      showMilestonePopup(reached)
+    }
+  }
 }
 
 document.addEventListener("DOMContentLoaded",function(){
-  if(typeof Papa==="undefined"){
-    alert("PapaParse failed to load.")
-    return
-  }
-
   Papa.parse("blackpink.csv",{
     download:true,
     header:true,
