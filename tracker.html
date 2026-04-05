@@ -1,56 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BLACKPINK Shazam Tracker</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+@font-face{
+  font-family:"BPFont";
+  src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");
+}
+
+body{margin:0;background:black;color:white;font-family:"BPFont",sans-serif;}
+header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
+.updated{text-align:center;opacity:.7;margin-bottom:20px;}
+
+.section{margin:40px 0;position:relative;overflow:hidden;}
+.section-bg{position:absolute;width:100%;height:100%;background-size:cover;background-position:center;filter:blur(12px) brightness(.35);transform:scale(1.2);}
+.section-content{position:relative;padding:30px;}
+.section h2{color:#ff2ea6;font-size:28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
+.song{display:flex;align-items:center;gap:15px;padding:10px;margin:8px 0;background:rgba(0,0,0,.55);border-radius:10px;transition:.25s;position:relative;flex-wrap:wrap;}
+.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2ea6;}
+
+.rank{font-size:20px;width:40px;}
+.song img{width:50px;border-radius:6px;}
+.info{flex:1;min-width:120px;}
+
+.bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
+.bar span{display:block;height:100%;background:#ff2ea6;}
+
+.total-shazams{font-size:12px;opacity:0.7;margin-top:3px;}
+.hoverstats{font-size:12px;opacity:0;transition:.2s;margin-top:5px;}
+.song:hover .hoverstats{opacity:1;}
+.song:hover .total-shazams{opacity:0.5;}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:flex;align-items:center;justify-content:center;
+  z-index:999;padding:20px;
+}
+
+.card{
+  background:black;padding:15px;border-radius:12px;
+  text-align:center;width:min(520px,95%);
+  max-height:90vh;display:flex;flex-direction:column;
+}
+
+.exportArea{
+  padding:15px;background:black;border-radius:12px;
+  font-size:18px;overflow:hidden;
+}
+
+.exportArea img{
+  width:100%;max-height:220px;object-fit:cover;
+  border-radius:10px;margin-bottom:10px;
+}
+
+.exportArea h2{font-size:26px;color:#ff2ea6;}
+.exportArea p{font-size:18px;}
+
+button.pink{
+  background:#ff2ea6;color:white;border:none;
+  padding:6px 10px;border-radius:6px;
+  cursor:pointer;margin-top:5px;
+}
+
+.milestone-popup{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.9);
+  padding:20px 25px;border-radius:14px;
+  font-size:18px;z-index:9999;
+  width:min(500px,95%);
+  border:1px solid rgba(255,46,166,.5);
+}
+
+.milestone-popup h2{
+  margin:0 0 10px 0;color:#ff2ea6;font-size:20px;
+}
+
+.confetti-piece{
+  position:fixed;
+  pointer-events:none;
+  z-index:10000;
+  width:60px;
+  height:60px;
+  background-size:contain;
+  background-repeat:no-repeat;
+}
+
+</style>
+</head>
+<body>
+
+<header>BLACKPINK Shazam Tracker</header>
+<div class="updated" id="updated"></div>
+<div id="content"></div>
+
 <script>
+
 let songs=[]
 let confettiActive=[]
 
-function exact(n){ return Number(n||0).toLocaleString() }
+function exact(n){return Number(n||0).toLocaleString()}
 
 const milestones=[]
-for(let i=100000;i<=5000000;i+=100000){ milestones.push(i) }
+for(let i=100000;i<=5000000;i+=100000){milestones.push(i)}
 
-function nextMilestone(v){ return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000 }
-function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }); return last }
-function progress(v){ let prev=lastMilestone(v); let next=nextMilestone(v); return Math.floor(((v-prev)/(next-prev))*100) }
-function milestoneText(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; return (v/1000)+"k" }
+function nextMilestone(v){return milestones.find(m=>m>v)||Math.ceil(v/1000000)*1000000}
+function lastMilestone(v){let l=0;milestones.forEach(m=>{if(v>=m)l=m});return l}
+function progress(v){let p=lastMilestone(v);let n=nextMilestone(v);return Math.floor(((v-p)/(n-p))*100)}
+function milestoneText(v){return v>=1000000?(v/1000000).toFixed(1)+"M":(v/1000)+"k"}
 
-/* ================= CONFETTI ================= */
+/* CONFETTI WITH MOVEMENT + GLOW */
 
 function launchConfetti(){
-
-  const images=[
-    "images/lightstick1.png",
-    "images/lightstick2.png",
-    "images/bplogo.png"
-  ]
+  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
 
   for(let i=0;i<45;i++){
-
     let c=document.createElement("div")
     c.className="confetti-piece"
 
     let chosen=images[Math.floor(Math.random()*images.length)]
     c.style.backgroundImage=`url("${chosen}")`
 
-    // Glow for BP logo
     if(chosen.includes("bplogo")){
       c.style.filter="drop-shadow(0 0 8px #ff2ea6) drop-shadow(0 0 18px #ff2ea6)"
     }
 
     let x=Math.random()*window.innerWidth
     let y=-60
-    let drift=(Math.random()-0.5)*2
+    let drift=(Math.random()-0.5)*3
     let speed=Math.random()*3+2
     let rotate=Math.random()*360
-    let rotateSpeed=(Math.random()-0.5)*5
+    let rotateSpeed=(Math.random()-0.5)*6
 
     c.style.left=x+"px"
     c.style.top=y+"px"
 
     document.body.appendChild(c)
-    confettiActive.push(c)
 
     function animate(){
-      if(!document.body.contains(c)) return
-
       y+=speed
       x+=drift
       rotate+=rotateSpeed
@@ -70,58 +163,85 @@ function launchConfetti(){
   }
 }
 
-function stopConfetti(){
-  confettiActive.forEach(c=>c.remove())
-  confettiActive=[]
-}
-
-/* ================= MILESTONE ================= */
+/* MILESTONE CHECK */
 
 function checkMilestones(){
   let reached=[]
   songs.forEach(s=>{
-    if(s.Previous==null) return
+    if(s.Previous==null)return
     let oldM=lastMilestone(s.Previous)
     let newM=lastMilestone(s.Shazams)
-    if(newM>oldM){
-      reached.push(s)
-    }
+    if(newM>oldM)reached.push(s)
   })
-  if(reached.length>0){
-    showMilestonePopup(reached)
-  }
+  if(reached.length>0)showMilestonePopup(reached)
 }
 
 function showMilestonePopup(list){
-  if(list.length===0) return
-
   launchConfetti()
-
   let pop=document.createElement("div")
   pop.className="milestone-popup"
-  pop.innerHTML=
-    "<h2>Milestone Achievements</h2><ul>"+
-    list.map(s=>
-      `<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`
-    ).join("")+
-    "</ul><button onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
-
+  pop.innerHTML="<h2>Milestone Achievements</h2><ul>"+
+  list.map(s=>`<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))}</li>`).join("")+
+  "</ul><button onclick='this.parentNode.remove()'>Close</button>"
   document.body.appendChild(pop)
-
-  setTimeout(()=>{
-    if(pop.parentNode){
-      pop.remove()
-      stopConfetti()
-    }
-  },20000)
 }
 
-/* ================= BUILD ================= */
+/* YOUR ORIGINAL BUILD + SHARE LOGIC */
+
+function createSong(s,rank){
+  let div=document.createElement("div")
+  div.className="song"
+  div.innerHTML=`
+  <div class="rank">${rank}</div>
+  <img src="images/${s.ImageFile}">
+  <div class="info">
+    ${s.Song}
+    <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
+    <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
+    <div class="hoverstats">
+      +${exact((s.Shazams||0)-(s.Previous||0))} • ${progress(s.Shazams)}%
+    </div>
+  </div>
+  <button class="pink" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">Share</button>`
+  return div
+}
+
+function createSection(name,list){
+  let div=document.createElement("div")
+  div.className="section"
+  let total=list.reduce((a,b)=>a+b.Shazams,0)
+
+  div.innerHTML=`
+  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
+  <div class="section-content">
+    <h2>${name}
+    <button class="pink" onclick="openPromo('${name}','',${total},'${sectionImage(name)}')">Share</button>
+    </h2>
+  </div>`
+
+  let content=div.querySelector(".section-content")
+  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
+  return div
+}
+
+function sectionImage(name){
+  const map={
+    "GLOBAL TOP 10":"images/ot4.jpg",
+    "DEADLINE":"images/deadline2.png",
+    "BORN PINK":"images/bornpink.jpg",
+    "THE ALBUM":"images/thealbum.jpg",
+    "KILL THIS LOVE - EP":"images/killthislove.jpg",
+    "SQUARE UP":"images/squareup.jpg",
+    "SQUARE TWO":"images/squaretwo.jpg",
+    "SQUARE ONE":"images/squareone.jpg",
+    "Others":"images/asifitsyourlast.jpg"
+  }
+  return map[name]||"images/ot4.jpg"
+}
 
 function build(){
   let c=document.getElementById("content")
   c.innerHTML=""
-
   let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
   c.appendChild(createSection("GLOBAL TOP 10",top))
 
@@ -132,7 +252,7 @@ function build(){
   })
 }
 
-/* ================= CSV LOAD ================= */
+/* CSV LOAD */
 
 Papa.parse("blackpink.csv",{
   download:true,
@@ -141,9 +261,11 @@ Papa.parse("blackpink.csv",{
   complete:function(res){
     songs=res.data.filter(x=>x.Song)
     build()
-    checkMilestones()   // ← THIS was missing before
-    document.getElementById("updated").innerText=
-      "Last Updated: "+songs[0]["Last Update"]
+    checkMilestones()
+    document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
   }
 })
+
 </script>
+</body>
+</html>
