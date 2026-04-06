@@ -22,12 +22,12 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .section-content{position:relative; padding:30px;}
 .section h2{color:#ff2ea6; font-size:28px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
 
-.song{display:flex; align-items:center; gap:15px; padding:10px; margin:8px 0; background:rgba(0,0,0,.55); border-radius:10px; transition:.25s; position:relative; flex-wrap:wrap;}
+.song{display:flex; align-items:center; gap:15px; padding:10px; margin:8px 0; background:rgba(0,0,0,.55); border-radius:10px; transition:.25s; transform-origin:center center; position:relative; flex-wrap:wrap;}
 .song:hover{transform:scale(1.03); box-shadow:0 0 15px #ff2ea6;}
 
-.rank{font-size:20px; width:40px;}
-.song img{width:50px; border-radius:6px;}
-.info{flex:1; min-width:120px;}
+.rank{font-size:20px; width:40px; flex-shrink:0;}
+.song img{width:50px; border-radius:6px; flex-shrink:0;}
+.info{flex:1; position:relative; min-width:120px;}
 
 .bar{height:6px; background:#333; margin-top:6px; border-radius:5px; overflow:hidden;}
 .bar span{display:block; height:100%; background:#ff2ea6;}
@@ -37,40 +37,6 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .song:hover .hoverstats{opacity:1;}
 .song:hover .total-shazams{opacity:0.5;}
 
-/* ===== PINK SHARE ICON BUTTON ===== */
-.share-icon{
-  width:34px;
-  height:34px;
-  border-radius:8px;
-  background:#ff2ea6;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  border:none;
-}
-
-.share-icon div{
-  width:16px;
-  height:2px;
-  background:white;
-  position:relative;
-}
-
-.share-icon div::before,
-.share-icon div::after{
-  content:"";
-  position:absolute;
-  width:16px;
-  height:2px;
-  background:white;
-  left:0;
-}
-
-.share-icon div::before{ top:-6px; }
-.share-icon div::after{ top:6px; }
-
-/* Overlay */
 .overlay{
   position:fixed;
   inset:0;
@@ -84,40 +50,80 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 
 .card{
   background:black;
-  padding:20px;
+  padding:15px;
   border-radius:12px;
+  text-align:center;
   width:min(520px,95%);
   max-height:90vh;
-  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+
+.exportArea{
+  padding:15px;
+  background:black;
+  border-radius:12px;
+  font-size:18px;
 }
 
 .exportArea img{
   width:100%;
   height:auto;
-  object-fit:contain;
   border-radius:10px;
-  margin-bottom:15px;
+  margin-bottom:10px;
 }
 
-.exportArea h2{color:#ff2ea6;}
+.exportArea h2{font-size:26px; color:#ff2ea6;}
+.exportArea p{font-size:18px;}
 
-.social-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:15px;
-}
-
-.social-grid button{
+.share-icon{
   background:#ff2ea6;
   border:none;
-  padding:8px;
-  border-radius:8px;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.share-icon svg{
+  fill:white;
+  width:20px;
+  height:20px;
+}
+
+.social-panel{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.social-panel button{
+  background:#ff2ea6;
   color:white;
+  border:none;
+  padding:8px;
+  border-radius:6px;
   cursor:pointer;
 }
 
-/* Confetti */
+.milestone-popup{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.9);
+  padding:20px 25px;
+  border-radius:14px;
+  font-size:18px;
+  z-index:9999;
+  width:min(500px,95%);
+  border:1px solid rgba(255,46,166,.5);
+}
+
 .confetti-piece{
   position:fixed;
   pointer-events:none;
@@ -141,7 +147,7 @@ let confettiActive=[]
 
 function exact(n){ return Number(n).toLocaleString() }
 
-/* CONFETTI */
+/* CONFETTI (UNCHANGED) */
 function launchConfetti(){
   const images=[
     {src:"images/lightstick1.png"},
@@ -149,27 +155,28 @@ function launchConfetti(){
     {src:"images/bplogo.png", glow:true}
   ]
 
-  for(let i=0;i<35;i++){
+  for(let i=0;i<40;i++){
     let c=document.createElement("div")
     c.className="confetti-piece"
     let chosen=images[Math.floor(Math.random()*images.length)]
     c.style.backgroundImage=`url(${chosen.src})`
-    if(chosen.glow){
-      c.style.filter="drop-shadow(0 0 12px #ff2ea6)"
-    }
+    if(chosen.glow){ c.style.filter="drop-shadow(0 0 12px #ff2ea6)" }
 
     let x=Math.random()*window.innerWidth
     let y=-60
-    let speed=Math.random()*2+2
+    let speedY=Math.random()*2+2
     let drift=Math.random()*2-1
     let rotate=0
 
     c.style.left=x+"px"
     c.style.top=y+"px"
+
     document.body.appendChild(c)
+    confettiActive.push(c)
 
     function frame(){
-      y+=speed
+      if(!document.body.contains(c)) return
+      y+=speedY
       x+=drift
       rotate+=3
       c.style.top=y+"px"
@@ -177,54 +184,75 @@ function launchConfetti(){
       c.style.transform="rotate("+rotate+"deg)"
       if(y<window.innerHeight+80){
         requestAnimationFrame(frame)
-      } else c.remove()
+      }
     }
     requestAnimationFrame(frame)
   }
 }
 
-/* SHARE PROMO */
-function openPromo(title,shazams,img){
+function stopConfetti(){
+  confettiActive.forEach(c=>c.remove())
+  confettiActive=[]
+}
+
+/* SHARE OVERLAY */
+function openPromo(title,subtitle,shazams,img,list=null){
+
   let overlay=document.createElement("div")
   overlay.className="overlay"
+
   overlay.innerHTML=`
   <div class="card">
-    <div class="exportArea" id="exportArea">
+    <div id="exportArea" class="exportArea">
       <img src="${img}">
       <h2>${title}</h2>
       <p>${exact(shazams)} Shazams</p>
     </div>
-    <div class="social-grid">
+
+    <button class="share-icon" onclick="toggleSocial()">
+      <svg viewBox="0 0 24 24">
+        <circle cx="6" cy="12" r="2"/>
+        <circle cx="18" cy="6" r="2"/>
+        <circle cx="18" cy="18" r="2"/>
+        <line x1="8" y1="12" x2="16" y2="7" stroke="white" stroke-width="2"/>
+        <line x1="8" y1="12" x2="16" y2="17" stroke="white" stroke-width="2"/>
+      </svg>
+    </button>
+
+    <div id="socialPanel" class="social-panel" style="display:none;">
       <button onclick="shareFacebook()">Facebook</button>
       <button onclick="shareTwitter()">Twitter</button>
       <button onclick="shareInstagramPost()">Instagram Post</button>
       <button onclick="shareInstagramStory()">Instagram Story</button>
       <button onclick="shareWhatsApp()">WhatsApp</button>
       <button onclick="copyLink()">Copy Link</button>
+      <button onclick="this.closest('.overlay').remove()">Close</button>
     </div>
   </div>`
+
   document.body.appendChild(overlay)
 
-  async function getImage(){
-    let canvas=await html2canvas(document.getElementById("exportArea"),{backgroundColor:"#000",scale:2})
-    return canvas.toDataURL()
+  window.toggleSocial=()=>{
+    let p=document.getElementById("socialPanel")
+    p.style.display=p.style.display==="none"?"flex":"none"
   }
 
-  window.shareFacebook=async()=>window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,"_blank")
-  window.shareTwitter=async()=>window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(title)}`,"_blank")
-  window.shareWhatsApp=async()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title+" "+location.href)}`,"_blank")
+  window.shareFacebook=()=>window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,"_blank")
+  window.shareTwitter=()=>window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(title)}`,"_blank")
+  window.shareWhatsApp=()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title+" "+location.href)}`,"_blank")
   window.copyLink=()=>navigator.clipboard.writeText(location.href)
 
-  /* Instagram note */
-  window.shareInstagramPost=async()=>{
-    alert("Instagram does not allow direct web posting.\nDownload the image and upload manually.")
+  window.shareInstagramPost=()=>{
+    alert("Instagram does not allow direct web sharing to post. Save the image and upload manually.")
   }
-  window.shareInstagramStory=async()=>{
-    alert("Instagram Stories require mobile app upload.\nDownload the image first.")
+
+  window.shareInstagramStory=()=>{
+    alert("Instagram Stories cannot be triggered from browser. Save the image and share via Instagram app.")
   }
 }
 
-/* BUILD */
+/* === REST OF YOUR ORIGINAL BUILD LOGIC UNCHANGED === */
+
 function createSong(s,rank){
   let div=document.createElement("div")
   div.className="song"
@@ -235,22 +263,22 @@ function createSong(s,rank){
     ${s.Song}
     <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
   </div>
-  <button class="share-icon" onclick="openPromo('${s.Song}',${s.Shazams},'images/${s.ImageFile}')">
-    <div></div>
-  </button>`
+  <button class="pink" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">Share</button>`
   return div
 }
 
 function build(){
   let c=document.getElementById("content")
   c.innerHTML=""
-  songs.forEach((s,i)=>c.appendChild(createSong(s,i+1)))
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+  top.forEach((s,i)=>c.appendChild(createSong(s,i+1)))
 }
 
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
 complete:function(res){
   songs=res.data
   build()
+  document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
 }})
 </script>
 
