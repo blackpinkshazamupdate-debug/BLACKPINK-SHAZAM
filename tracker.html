@@ -37,7 +37,6 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .song:hover .hoverstats{opacity:1;}
 .song:hover .total-shazams{opacity:0.5;}
 
-/* ✅ FIXED PROMO OVERLAY */
 .overlay{
   position:fixed;
   inset:0;
@@ -94,36 +93,17 @@ button.pink{
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.9);
   padding:20px 25px;
   border-radius:14px;
-  font-size:18px;
   z-index:9999;
-  width:min(500px,95%);
-  backdrop-filter:blur(6px);
   border:1px solid rgba(255,46,166,.5);
+  width:min(500px,95%);
 }
 
 .milestone-popup h2{
-  margin:0 0 10px 0;
+  margin:0 0 10px;
   color:#ff2ea6;
-  font-size:20px;
-}
-
-.milestone-popup ul{
-  padding-left:18px;
-  margin:0;
-  text-align:left;
-}
-
-.milestone-popup button{
-  margin-top:12px;
-  background:#ff2ea6;
-  color:white;
-  border:none;
-  padding:6px 12px;
-  border-radius:6px;
-  cursor:pointer;
 }
 
 .confetti-piece{
@@ -134,17 +114,6 @@ button.pink{
   height:60px;
   background-size:contain;
   background-repeat:no-repeat;
-  opacity:1;
-  transition: opacity 2s;
-}
-
-@media (max-width:768px){
-  header{font-size:28px;padding:20px;}
-  .section-content{padding:20px;}
-  .song{gap:10px;padding:8px;}
-  .rank{width:30px;font-size:16px;}
-  .song img{width:40px;}
-  .section h2{font-size:22px;}
 }
 </style>
 </head>
@@ -164,20 +133,39 @@ function exact(n){ return Number(n).toLocaleString() }
 const milestones=[]
 for(let i=100000;i<=5000000;i+=100000){ milestones.push(i) }
 
-function nextMilestone(v){ return milestones.find(m=>m>v) || Math.ceil(v/1000000)*1000000 }
-function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }); return last }
-function progress(v){ let prev=lastMilestone(v); let next=nextMilestone(v); return Math.floor(((v-prev)/(next-prev))*100) }
-function milestoneText(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; return (v/1000)+"k" }
+function lastMilestone(v){
+  let last=0
+  milestones.forEach(m=>{ if(v>=m) last=m })
+  return last
+}
 
-/* CONFETTI */
+function milestoneText(v){
+  if(v>=1000000) return (v/1000000).toFixed(1)+"M"
+  return (v/1000)+"k"
+}
+
+/* CONFETTI WITH REAL MOVEMENT */
 function launchConfetti(){
-  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
-  for(let i=0;i<40;i++){
+  const images=[
+    {src:"images/lightstick1.png"},
+    {src:"images/lightstick2.png"},
+    {src:"images/bplogo.png", glow:true}
+  ]
+
+  for(let i=0;i<45;i++){
     let c=document.createElement("div")
     c.className="confetti-piece"
+
+    let chosen=images[Math.floor(Math.random()*images.length)]
+    c.style.backgroundImage=`url(${chosen.src})`
+
+    if(chosen.glow){
+      c.style.filter="drop-shadow(0 0 12px #ff2ea6)"
+    }
+
     c.style.left=Math.random()*window.innerWidth+"px"
-    c.style.top="-60px"
-    c.style.backgroundImage=`url(${images[Math.floor(Math.random()*images.length)]})`
+    c.style.top="-80px"
+
     document.body.appendChild(c)
     confettiActive.push(c)
     animateConfetti(c)
@@ -185,156 +173,114 @@ function launchConfetti(){
 }
 
 function animateConfetti(c){
-  let fall=Math.random()*3+2
+  let x=parseFloat(c.style.left)
+  let y=-80
+  let speedY=Math.random()*3+2
+  let drift=Math.random()*4-2
+  let rotation=Math.random()*360
+  let spin=(Math.random()*4)-2
+
   function frame(){
     if(!document.body.contains(c)) return
-    c.style.top=(parseFloat(c.style.top)+fall)+"px"
-    if(parseFloat(c.style.top)<window.innerHeight+60) requestAnimationFrame(frame)
+    y+=speedY
+    x+=drift
+    rotation+=spin
+
+    c.style.top=y+"px"
+    c.style.left=x+"px"
+    c.style.transform="rotate("+rotation+"deg)"
+
+    if(y<window.innerHeight+100){
+      requestAnimationFrame(frame)
+    }
   }
+
   requestAnimationFrame(frame)
 }
 
 function stopConfetti(){
-  confettiActive.forEach(c=>{c.style.opacity=0; setTimeout(()=>c.remove(),2000)})
+  confettiActive.forEach(c=>c.remove())
   confettiActive=[]
 }
 
 /* MILESTONE POPUP */
 function showMilestonePopup(list){
   if(list.length===0) return
+
   launchConfetti()
+
   let pop=document.createElement("div")
   pop.className="milestone-popup"
-  pop.innerHTML="<h2>Milestone Achievements</h2><ul>"+
-  list.map(s=>`<li>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))} Shazams</li>`).join("")
-  +"</ul><button onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
+  pop.innerHTML="<h2>Milestone Achievements</h2>"+
+  list.map(s=>`<div>${s.Song} reached ${milestoneText(lastMilestone(s.Shazams))}</div>`).join("")+
+  "<button class='pink' onclick='this.parentNode.remove();stopConfetti()'>Close</button>"
+
   document.body.appendChild(pop)
-  setTimeout(()=>{ if(pop.parentNode){ pop.remove(); stopConfetti() } },20000)
-}
 
-/* PROMO */
-async function sharePromo(){
-  let area=document.getElementById("exportArea")
-  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
-  canvas.toBlob(async blob=>{
-    let file=new File([blob],"blackpink.png",{type:"image/png"})
-    if(navigator.share){
-      await navigator.share({files:[file],text:"BLACKPINK Shazam Tracker",url:location.href})
+  setTimeout(()=>{
+    if(pop.parentNode){
+      pop.remove()
+      stopConfetti()
     }
-  })
+  },20000)
 }
 
-async function downloadPromo(){
-  let area=document.getElementById("exportArea")
-  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
-  let a=document.createElement("a")
-  a.href=canvas.toDataURL()
-  a.download="blackpink-promo.png"
-  a.click()
-}
-
-function openPromo(title,subtitle,shazams,img,list=null){
-  let contentHTML=""
-  if(list){
-    contentHTML+="<div style='text-align:left;margin-top:10px;'>"
-    list.forEach((s,i)=>{ contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>` })
-    contentHTML+="</div>"
-  }
-  let overlay=document.createElement("div")
-  overlay.className="overlay"
-  overlay.innerHTML=`
-  <div class="card">
-    <div id="exportArea" class="exportArea">
-      <img src="${img}">
-      <h2>${title}</h2>
-      <p>${exact(shazams)} Shazams</p>
-      ${contentHTML}
-    </div>
-    <div>
-      <button class="pink" onclick="sharePromo()">Share</button>
-      <button class="pink" onclick="downloadPromo()">Download</button>
-      <button class="pink" onclick="this.closest('.overlay').remove()">Close</button>
-    </div>
-  </div>`
-  document.body.appendChild(overlay)
-}
-
-/* SONG + SECTION BUILD LOGIC REMAINS UNCHANGED */
-function createSong(s,rank){
-  let div=document.createElement("div")
-  div.className="song"
-  div.innerHTML=`
-  <div class="rank">${rank}</div>
-  <img src="images/${s.ImageFile}">
-  <div class="info">
-    ${s.Song}
-    <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
-    <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-    <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
-  </div>
-  <button class="pink" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">Share</button>`
-  return div
-}
-
-function createSection(name,list){
-  let div=document.createElement("div")
-  div.className="section"
-  let total=list.reduce((a,b)=>a+b.Shazams,0)
-  let safeList=encodeURIComponent(JSON.stringify(list))
-  let promoImage=(name==="DEADLINE")?"images/deadline.jpg":sectionImage(name)
-  div.innerHTML=`
-  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
-  <div class="section-content">
-    <h2>${name}
-    <button class="pink" onclick="openSectionPromo('${name}',${total},'${promoImage}','${safeList}')">Share</button>
-    </h2>
-  </div>`
-  let content=div.querySelector(".section-content")
-  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
-  return div
-}
-
-function openSectionPromo(name,total,img,encoded){
-  let list=JSON.parse(decodeURIComponent(encoded))
-  openPromo(name,"",total,img,list)
-}
-
-function sectionImage(name){
-  const map={
-    "GLOBAL TOP 10":"images/ot4.jpg",
-    "DEADLINE":"images/deadline2.png",
-    "BORN PINK":"images/bornpink.jpg",
-    "THE ALBUM":"images/thealbum.jpg",
-    "KILL THIS LOVE - EP":"images/killthislove.jpg",
-    "SQUARE UP":"images/squareup.jpg",
-    "SQUARE TWO":"images/squaretwo.jpg",
-    "SQUARE ONE":"images/squareone.jpg",
-    "Others":"images/asifitsyourlast.jpg"
-  }
-  return map[name]||"images/ot4.jpg"
-}
-
+/* BUILD */
 function build(){
   let c=document.getElementById("content")
   c.innerHTML=""
-  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
-  let topDiv=createSection("GLOBAL TOP 10",top)
-  topDiv.querySelector("button.pink").onclick=
-  ()=>openPromo("GLOBAL TOP 10","",top.reduce((a,b)=>a+b.Shazams,0),"images/ot4.jpg",top)
-  c.appendChild(topDiv)
-  let sections=[...new Set(songs.map(s=>s.Section))]
-  sections.forEach(sec=>{
-    if(sec!=="GLOBAL TOP 10")
-      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
+
+  let reachedNow=[]
+
+  songs.forEach(s=>{
+    let milestone=lastMilestone(s.Shazams)
+    if(milestone>0){
+      let key=s.Song+"-"+milestone
+      if(!milestonesReached.includes(key)){
+        milestonesReached.push(key)
+        reachedNow.push(s)
+      }
+    }
   })
+
+  if(reachedNow.length>0){
+    setTimeout(()=>showMilestonePopup(reachedNow),800)
+  }
+
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+
+  let section=document.createElement("div")
+  section.className="section"
+  section.innerHTML="<div class='section-content'><h2>GLOBAL TOP 10</h2></div>"
+
+  let content=section.querySelector(".section-content")
+  top.forEach((s,i)=>{
+    let div=document.createElement("div")
+    div.className="song"
+    div.innerHTML=`
+      <div class="rank">${i+1}</div>
+      <img src="images/${s.ImageFile}">
+      <div class="info">
+        ${s.Song}
+        <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
+      </div>`
+    content.appendChild(div)
+  })
+
+  c.appendChild(section)
 }
 
-Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
-complete:function(res){
-  songs=res.data
-  build()
-  document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
-}})
+/* LOAD CSV */
+Papa.parse("blackpink.csv",{
+  download:true,
+  header:true,
+  dynamicTyping:true,
+  complete:function(res){
+    songs=res.data.filter(s=>s.Song)
+    build()
+    document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
+  }
+})
 </script>
 
 </body>
