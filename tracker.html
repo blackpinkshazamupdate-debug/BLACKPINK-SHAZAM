@@ -69,6 +69,7 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 
 .exportArea img{
   width:100%;
+  height:auto; /* FIXED: prevent crushing */
   max-height:220px;
   object-fit:cover;
   border-radius:10px;
@@ -172,40 +173,26 @@ function launchConfetti(){
     {src:"images/lightstick2.png"},
     {src:"images/bplogo.png", glow:true}
   ]
-
   for(let i=0;i<40;i++){
     let c=document.createElement("div")
     c.className="confetti-piece"
-
     let chosen=images[Math.floor(Math.random()*images.length)]
     c.style.backgroundImage=`url(${chosen.src})`
-    if(chosen.glow){
-      c.style.filter="drop-shadow(0 0 12px #ff2ea6)"
-    }
-
+    if(chosen.glow){c.style.filter="drop-shadow(0 0 12px #ff2ea6)"}
     let x=Math.random()*window.innerWidth
     let y=-60
     let speedY=Math.random()*2+2
     let drift=Math.random()*2-1
     let rotate=0
-
     c.style.left=x+"px"
     c.style.top=y+"px"
-
     document.body.appendChild(c)
     confettiActive.push(c)
-
     function frame(){
       if(!document.body.contains(c)) return
-      y+=speedY
-      x+=drift
-      rotate+=3
-      c.style.top=y+"px"
-      c.style.left=x+"px"
-      c.style.transform="rotate("+rotate+"deg)"
-      if(y<window.innerHeight+80){
-        requestAnimationFrame(frame)
-      }
+      y+=speedY; x+=drift; rotate+=3
+      c.style.top=y+"px"; c.style.left=x+"px"; c.style.transform="rotate("+rotate+"deg)"
+      if(y<window.innerHeight+80) requestAnimationFrame(frame)
     }
     requestAnimationFrame(frame)
   }
@@ -233,7 +220,6 @@ function showMilestonePopup(list){
 async function sharePromo(){
   let area=document.getElementById("exportArea")
   if(!area) return
-  // mobile-friendly scaling
   let scale = window.innerWidth < 768 ? 3 : 2
   let canvas = await html2canvas(area,{backgroundColor:"#000", scale: scale})
   canvas.toBlob(async blob=>{
@@ -241,7 +227,6 @@ async function sharePromo(){
     if(navigator.share){
       await navigator.share({files:[file],text:"BLACKPINK Shazam Tracker",url:location.href})
     } else {
-      // fallback for desktop: open image in new tab
       let url=URL.createObjectURL(blob)
       window.open(url,"_blank")
     }
@@ -286,7 +271,6 @@ function openPromo(title,subtitle,shazams,img,list=null){
 }
 
 /* === EVERYTHING ELSE UNCHANGED === */
-
 function createSong(s,rank){
   let div=document.createElement("div")
   div.className="song"
@@ -346,6 +330,10 @@ function build(){
   c.innerHTML=""
   let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
   let topDiv=createSection("GLOBAL TOP 10",top)
+  // FIXED top10 share button
+  let totalTop = top.reduce((a,b)=>a+b.Shazams,0)
+  topDiv.querySelector("button.pink").onclick=
+    ()=>openPromo("GLOBAL TOP 10","",totalTop,"images/ot4.jpg",top)
   c.appendChild(topDiv)
   let sections=[...new Set(songs.map(s=>s.Section))]
   sections.forEach(sec=>{
