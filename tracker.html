@@ -229,7 +229,56 @@ function showMilestonePopup(list){
   setTimeout(()=>{ if(pop.parentNode){ pop.remove(); stopConfetti() } },20000)
 }
 
-/* === EVERYTHING BELOW IS YOUR ORIGINAL CODE UNCHANGED === */
+/* ===== PROMO + SHARE FIX ===== */
+async function sharePromo(){
+  let area=document.getElementById("exportArea")
+  if(!area) return
+  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
+  canvas.toBlob(async blob=>{
+    let file=new File([blob],"blackpink.png",{type:"image/png"})
+    if(navigator.share){
+      await navigator.share({files:[file],text:"BLACKPINK Shazam Tracker",url:location.href})
+    }
+  })
+}
+
+async function downloadPromo(){
+  let area=document.getElementById("exportArea")
+  if(!area) return
+  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
+  let a=document.createElement("a")
+  a.href=canvas.toDataURL()
+  a.download="blackpink-promo.png"
+  a.click()
+}
+
+function openPromo(title,subtitle,shazams,img,list=null){
+  let contentHTML=""
+  if(list){
+    contentHTML+="<div style='text-align:left;margin-top:10px;'>"
+    list.forEach((s,i)=>{ contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>` })
+    contentHTML+="</div>"
+  }
+  let overlay=document.createElement("div")
+  overlay.className="overlay"
+  overlay.innerHTML=`
+  <div class="card">
+    <div id="exportArea" class="exportArea">
+      <img src="${img}">
+      <h2>${title}</h2>
+      <p>${exact(shazams)} Shazams</p>
+      ${contentHTML}
+    </div>
+    <div>
+      <button class="pink" onclick="sharePromo()">Share</button>
+      <button class="pink" onclick="downloadPromo()">Download</button>
+      <button class="pink" onclick="this.closest('.overlay').remove()">Close</button>
+    </div>
+  </div>`
+  document.body.appendChild(overlay)
+}
+
+/* === EVERYTHING ELSE ORIGINAL CODE UNCHANGED === */
 
 function createSong(s,rank){
   let div=document.createElement("div")
