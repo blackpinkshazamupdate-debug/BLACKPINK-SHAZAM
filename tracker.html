@@ -25,9 +25,9 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .song{display:flex; align-items:center; gap:15px; padding:10px; margin:8px 0; background:rgba(0,0,0,.55); border-radius:10px; transition:.25s; transform-origin:center center; position:relative; flex-wrap:wrap;}
 .song:hover{transform:scale(1.03); box-shadow:0 0 15px #ff2ea6;}
 
-.rank{font-size:20px; width:40px;}
-.song img{width:50px; border-radius:6px;}
-.info{flex:1;}
+.rank{font-size:20px; width:40px; flex-shrink:0;}
+.song img{width:50px; border-radius:6px; flex-shrink:0;}
+.info{flex:1; position:relative; min-width:120px;}
 
 .bar{height:6px; background:#333; margin-top:6px; border-radius:5px; overflow:hidden;}
 .bar span{display:block; height:100%; background:#ff2ea6;}
@@ -37,15 +37,21 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .song:hover .hoverstats{opacity:1;}
 .song:hover .total-shazams{opacity:0.5;}
 
-/* SHARE ICON */
 .share-icon{
-  width:22px;
-  height:22px;
+  background:none;
+  border:none;
   cursor:pointer;
-  fill:#ff2ea6;
+  padding:0;
 }
 
-/* OVERLAY */
+.share-icon svg{
+  width:22px;
+  height:22px;
+  stroke:#ff2ea6;
+  fill:none;
+  stroke-width:2;
+}
+
 .overlay{
   position:fixed;
   inset:0;
@@ -55,6 +61,7 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
   justify-content:center;
   z-index:999;
   padding:20px;
+  overflow-y:auto;
 }
 
 .card{
@@ -63,6 +70,7 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
   border-radius:12px;
   text-align:center;
   width:min(520px,95%);
+  max-height:90vh;
   display:flex;
   flex-direction:column;
 }
@@ -72,11 +80,13 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
   background:black;
   border-radius:12px;
   font-size:18px;
+  overflow:hidden;
 }
 
 .exportArea img{
   width:100%;
   height:auto;
+  object-fit:cover;
   border-radius:10px;
   margin-bottom:10px;
 }
@@ -84,21 +94,54 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 .exportArea h2{font-size:26px; color:#ff2ea6;}
 .exportArea p{font-size:18px;}
 
-.social-buttons{
+.social-grid{
   display:flex;
-  flex-wrap:wrap;
+  flex-direction:column;
   gap:8px;
-  justify-content:center;
   margin-top:12px;
 }
 
-.social-buttons button{
+.social-grid button{
   background:#ff2ea6;
   color:white;
   border:none;
-  padding:6px 12px;
+  padding:8px;
   border-radius:6px;
   cursor:pointer;
+}
+
+.milestone-popup{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.9);
+  padding:20px 25px;
+  border-radius:14px;
+  font-size:18px;
+  z-index:9999;
+  width:min(500px,95%);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,46,166,.5);
+}
+
+.confetti-piece{
+  position:fixed;
+  pointer-events:none;
+  z-index:10000;
+  width:60px;
+  height:60px;
+  background-size:contain;
+  background-repeat:no-repeat;
+}
+
+@media (max-width:768px){
+  header{font-size:28px;padding:20px;}
+  .section-content{padding:20px;}
+  .song{gap:10px;padding:8px;}
+  .rank{width:30px;font-size:16px;}
+  .song img{width:40px;}
+  .section h2{font-size:22px;}
 }
 </style>
 </head>
@@ -110,94 +153,141 @@ header{text-align:center; padding:30px; font-size:38px; color:#ff2ea6;}
 
 <script>
 let songs=[]
+let confettiActive=[]
 
 function exact(n){ return Number(n).toLocaleString() }
 
-/* SHARE ICON SVG */
-function shareSVG(){
-return `
-<svg class="share-icon" viewBox="0 0 24 24">
-<circle cx="18" cy="5" r="3"/>
-<circle cx="6" cy="12" r="3"/>
-<circle cx="18" cy="19" r="3"/>
-<line x1="8.6" y1="13.5" x2="15.4" y2="17.5" stroke="#ff2ea6" stroke-width="2"/>
-<line x1="15.4" y1="6.5" x2="8.6" y2="10.5" stroke="#ff2ea6" stroke-width="2"/>
-</svg>`
+/* ===== SHARE OVERLAY ===== */
+
+function openPromo(title,subtitle,shazams,img,list=null){
+
+  let overlay=document.createElement("div")
+  overlay.className="overlay"
+
+  overlay.innerHTML=`
+  <div class="card">
+    <div id="exportArea" class="exportArea">
+      <img src="${img}">
+      <h2>${title}</h2>
+      <p>${exact(shazams)} Shazams</p>
+    </div>
+
+    <div class="social-grid">
+      <button onclick="shareFacebook('${title}')">Facebook</button>
+      <button onclick="shareTwitter('${title}')">Twitter</button>
+      <button onclick="shareInstagram()">Instagram (Save image → Post or Story)</button>
+      <button onclick="shareWhatsApp('${title}')">WhatsApp</button>
+      <button onclick="copyLink()">Copy Page Link</button>
+      <button onclick="this.closest('.overlay').remove()">Close</button>
+    </div>
+  </div>`
+
+  document.body.appendChild(overlay)
 }
 
-/* PROMO OVERLAY */
-function openPromo(title,shazams,img){
-let overlay=document.createElement("div")
-overlay.className="overlay"
-overlay.innerHTML=`
-<div class="card">
-  <div id="exportArea" class="exportArea">
-    <img src="${img}">
-    <h2>${title}</h2>
-    <p>${exact(shazams)} Shazams</p>
-  </div>
-  <div class="social-buttons">
-    <button onclick="shareFacebook()">Facebook</button>
-    <button onclick="shareTwitter()">Twitter</button>
-    <button onclick="shareInstagramPost()">Instagram Post</button>
-    <button onclick="shareInstagramStory()">Instagram Story</button>
-    <button onclick="shareWhatsApp()">WhatsApp</button>
-    <button onclick="copyLink()">Copy Link</button>
-    <button onclick="this.closest('.overlay').remove()">Close</button>
-  </div>
-</div>`
-document.body.appendChild(overlay)
+function shareFacebook(title){
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,"_blank")
 }
 
-function shareFacebook(){
-window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(location.href),"_blank")
+function shareTwitter(title){
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(location.href)}`,"_blank")
 }
-function shareTwitter(){
-window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(location.href),"_blank")
+
+function shareWhatsApp(title){
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title+" "+location.href)}`,"_blank")
 }
-function shareWhatsApp(){
-window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(location.href),"_blank")
+
+function shareInstagram(){
+  alert("Instagram does not allow direct web sharing.\nSave the promo image and post it as Story or Post manually.")
 }
-function shareInstagramPost(){
-alert("Download the promo image and upload it as Instagram Post.")
-}
-function shareInstagramStory(){
-alert("Download the promo image and upload it as Instagram Story.")
-}
+
 function copyLink(){
-navigator.clipboard.writeText(location.href)
-alert("Link copied!")
+  navigator.clipboard.writeText(location.href)
 }
 
-/* SONG */
+/* ===== SONG ===== */
+
 function createSong(s,rank){
-let div=document.createElement("div")
-div.className="song"
-div.innerHTML=`
-<div class="rank">${rank}</div>
-<img src="images/${s.ImageFile}">
-<div class="info">
-${s.Song}
-<div class="total-shazams">${exact(s.Shazams)} Shazams</div>
-</div>
-<div onclick="openPromo('${s.Song}',${s.Shazams},'images/${s.ImageFile}')">
-${shareSVG()}
-</div>`
-return div
+  let div=document.createElement("div")
+  div.className="song"
+  div.innerHTML=`
+  <div class="rank">${rank}</div>
+  <img src="images/${s.ImageFile}">
+  <div class="info">
+    ${s.Song}
+    <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
+  </div>
+  <button class="share-icon" onclick="openPromo('${s.Song}','',${s.Shazams},'images/${s.ImageFile}')">
+    <svg viewBox="0 0 24 24">
+      <circle cx="18" cy="5" r="3"/>
+      <circle cx="6" cy="12" r="3"/>
+      <circle cx="18" cy="19" r="3"/>
+      <line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/>
+      <line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/>
+    </svg>
+  </button>`
+  return div
 }
 
-/* BUILD */
+/* ===== REST OF YOUR CODE UNCHANGED ===== */
+
+function createSection(name,list){
+  let div=document.createElement("div")
+  div.className="section"
+  let total=list.reduce((a,b)=>a+b.Shazams,0)
+  let promoImage=sectionImage(name)
+  div.innerHTML=`
+  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
+  <div class="section-content">
+    <h2>${name}
+      <button class="share-icon" onclick="openPromo('${name}','',${total},'${promoImage}')">
+        <svg viewBox="0 0 24 24">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/>
+          <line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/>
+        </svg>
+      </button>
+    </h2>
+  </div>`
+  let content=div.querySelector(".section-content")
+  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
+  return div
+}
+
+function sectionImage(name){
+  const map={
+    "GLOBAL TOP 10":"images/ot4.jpg",
+    "DEADLINE":"images/deadline2.png",
+    "BORN PINK":"images/bornpink.jpg",
+    "THE ALBUM":"images/thealbum.jpg",
+    "KILL THIS LOVE - EP":"images/killthislove.jpg",
+    "SQUARE UP":"images/squareup.jpg",
+    "SQUARE TWO":"images/squaretwo.jpg",
+    "SQUARE ONE":"images/squareone.jpg",
+    "Others":"images/asifitsyourlast.jpg"
+  }
+  return map[name]||"images/ot4.jpg"
+}
+
 function build(){
-let c=document.getElementById("content")
-c.innerHTML=""
-let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
-top.forEach((s,i)=>c.appendChild(createSong(s,i+1)))
+  let c=document.getElementById("content")
+  c.innerHTML=""
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+  c.appendChild(createSection("GLOBAL TOP 10",top))
+  let sections=[...new Set(songs.map(s=>s.Section))]
+  sections.forEach(sec=>{
+    if(sec!=="GLOBAL TOP 10")
+      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
+  })
 }
 
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
 complete:function(res){
-songs=res.data
-build()
+  songs=res.data
+  build()
+  document.getElementById("updated").innerText="Last Updated: "+songs[0]["Last Update"]
 }})
 </script>
 
