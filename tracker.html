@@ -93,7 +93,7 @@ button.pink{
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.9);
   padding:20px 25px;
   border-radius:14px;
   font-size:18px;
@@ -133,8 +133,15 @@ button.pink{
   height:60px;
   background-size:contain;
   background-repeat:no-repeat;
-  opacity:1;
-  transition: opacity 2s;
+}
+
+@media (max-width:768px){
+  header{font-size:28px;padding:20px;}
+  .section-content{padding:20px;}
+  .song{gap:10px;padding:8px;}
+  .rank{width:30px;font-size:16px;}
+  .song img{width:40px;}
+  .section h2{font-size:22px;}
 }
 </style>
 </head>
@@ -146,7 +153,6 @@ button.pink{
 
 <script>
 let songs=[]
-let milestonesReached=[]
 let confettiActive=[]
 
 function exact(n){ return Number(n).toLocaleString() }
@@ -159,7 +165,7 @@ function lastMilestone(v){ let last=0; milestones.forEach(m=>{ if(v>=m) last=m }
 function progress(v){ let prev=lastMilestone(v); let next=nextMilestone(v); return Math.floor(((v-prev)/(next-prev))*100) }
 function milestoneText(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; return (v/1000)+"k" }
 
-/* CONFETTI WITH MOVEMENT */
+/* CONFETTI */
 function launchConfetti(){
   const images=[
     {src:"images/lightstick1.png"},
@@ -174,7 +180,7 @@ function launchConfetti(){
     let chosen=images[Math.floor(Math.random()*images.length)]
     c.style.backgroundImage=`url(${chosen.src})`
     if(chosen.glow){
-      c.style.filter="drop-shadow(0 0 10px #ff2ea6)"
+      c.style.filter="drop-shadow(0 0 12px #ff2ea6)"
     }
 
     let x=Math.random()*window.innerWidth
@@ -193,7 +199,7 @@ function launchConfetti(){
       if(!document.body.contains(c)) return
       y+=speedY
       x+=drift
-      rotate+=2
+      rotate+=3
       c.style.top=y+"px"
       c.style.left=x+"px"
       c.style.transform="rotate("+rotate+"deg)"
@@ -206,7 +212,7 @@ function launchConfetti(){
 }
 
 function stopConfetti(){
-  confettiActive.forEach(c=>{c.style.opacity=0; setTimeout(()=>c.remove(),2000)})
+  confettiActive.forEach(c=>c.remove())
   confettiActive=[]
 }
 
@@ -223,7 +229,7 @@ function showMilestonePopup(list){
   setTimeout(()=>{ if(pop.parentNode){ pop.remove(); stopConfetti() } },20000)
 }
 
-/* EVERYTHING BELOW IS UNCHANGED */
+/* === EVERYTHING BELOW IS YOUR ORIGINAL CODE UNCHANGED === */
 
 function createSong(s,rank){
   let div=document.createElement("div")
@@ -241,17 +247,64 @@ function createSong(s,rank){
   return div
 }
 
-/* ALL YOUR ORIGINAL SECTION + PROMO + BUILD CODE REMAINS EXACTLY THE SAME */
+function createSection(name,list){
+  let div=document.createElement("div")
+  div.className="section"
+  let total=list.reduce((a,b)=>a+b.Shazams,0)
+  let safeList=encodeURIComponent(JSON.stringify(list))
+  let promoImage=(name==="DEADLINE")?"images/deadline.jpg":sectionImage(name)
+  div.innerHTML=`
+  <div class="section-bg" style="background-image:url('${sectionImage(name)}')"></div>
+  <div class="section-content">
+    <h2>${name}
+    <button class="pink" onclick="openSectionPromo('${name}',${total},'${promoImage}','${safeList}')">Share</button>
+    </h2>
+  </div>`
+  let content=div.querySelector(".section-content")
+  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
+  return div
+}
+
+function openSectionPromo(name,total,img,encoded){
+  let list=JSON.parse(decodeURIComponent(encoded))
+  openPromo(name,"",total,img,list)
+}
+
+function sectionImage(name){
+  const map={
+    "GLOBAL TOP 10":"images/ot4.jpg",
+    "DEADLINE":"images/deadline2.png",
+    "BORN PINK":"images/bornpink.jpg",
+    "THE ALBUM":"images/thealbum.jpg",
+    "KILL THIS LOVE - EP":"images/killthislove.jpg",
+    "SQUARE UP":"images/squareup.jpg",
+    "SQUARE TWO":"images/squaretwo.jpg",
+    "SQUARE ONE":"images/squareone.jpg",
+    "Others":"images/asifitsyourlast.jpg"
+  }
+  return map[name]||"images/ot4.jpg"
+}
+
+function build(){
+  let c=document.getElementById("content")
+  c.innerHTML=""
+  let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
+  let topDiv=createSection("GLOBAL TOP 10",top)
+  c.appendChild(topDiv)
+  let sections=[...new Set(songs.map(s=>s.Section))]
+  sections.forEach(sec=>{
+    if(sec!=="GLOBAL TOP 10")
+      c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
+  })
+}
 
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
 complete:function(res){
   songs=res.data
 
-  // 🔥 MILESTONE CHECK (ADDED ONLY THIS)
   let reached=[]
   songs.forEach(s=>{
-    if(!s.Previous) return
-    if(lastMilestone(s.Shazams) > lastMilestone(s.Previous)){
+    if(s.Previous && lastMilestone(s.Shazams)>lastMilestone(s.Previous)){
       reached.push(s)
     }
   })
