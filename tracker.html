@@ -164,7 +164,9 @@ function openPromo(title,subtitle,shazams,img,list=null){
   let contentHTML=""
   if(list){
     contentHTML+="<div style='text-align:left;margin-top:10px;'>"
-    list.forEach((s,i)=>{ contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>` })
+    list.forEach((s,i)=>{
+      contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>`
+    })
     contentHTML+="</div>"
   }
 
@@ -174,70 +176,23 @@ function openPromo(title,subtitle,shazams,img,list=null){
   overlay.innerHTML=`
   <div class="card" style="position:relative;">
 
-    <!-- CLOSE X -->
-    <div onclick="this.closest('.overlay').remove()" 
-         style="position:absolute;top:10px;right:15px;
-         font-size:22px;cursor:pointer;color:#ff2ea6;">✕</div>
+    <div style="position:absolute;top:10px;right:15px;font-size:22px;cursor:pointer;color:#ff2ea6;"
+         onclick="this.closest('.overlay').remove()">✕</div>
 
-    <!-- EXPORT AREA -->
     <div id="exportArea" class="exportArea">
       <img src="${img}">
       <h2>${title}</h2>
       <p>${exact(shazams)} Shazams</p>
       ${contentHTML}
+      <p style="margin-top:10px;font-size:14px;opacity:.7;">${location.href}</p>
     </div>
 
-    <!-- SHARE ICON -->
-    <div style="margin-top:12px;">
-      <div onclick="toggleShareOptions()" 
-           style="cursor:pointer;display:inline-block;">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="#ff2ea6">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.5" y1="11" x2="15.5" y2="6.5" stroke="#ff2ea6" stroke-width="2"/>
-          <line x1="8.5" y1="13" x2="15.5" y2="17.5" stroke="#ff2ea6" stroke-width="2"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- SHARE OPTIONS -->
-    <div id="shareOptions" style="display:none;margin-top:15px;">
-
-      <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;">
-
-        <!-- FACEBOOK -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg"
-             width="28" style="cursor:pointer;filter:invert(1)"
-             onclick="shareFacebook()">
-
-        <!-- TWITTER -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/twitter.svg"
-             width="28" style="cursor:pointer;filter:invert(1)"
-             onclick="shareTwitter()">
-
-        <!-- INSTAGRAM POST -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg"
-             width="28" style="cursor:pointer;filter:invert(1)"
-             onclick="shareInstagramPost()">
-
-        <!-- INSTAGRAM STORY -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg"
-             width="28" style="cursor:pointer;filter:invert(1);border:2px solid #ff2ea6;border-radius:50%;padding:4px;"
-             onclick="shareInstagramStory()">
-
-        <!-- WHATSAPP -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
-             width="28" style="cursor:pointer;filter:invert(1)"
-             onclick="shareWhatsApp()">
-
-        <!-- COPY LINK -->
-        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/link.svg"
-             width="28" style="cursor:pointer;filter:invert(1)"
-             onclick="copyPageLink()">
-
-      </div>
-
+    <div style="display:flex;justify-content:center;gap:18px;margin-top:15px;font-size:24px;">
+      <span style="cursor:pointer;color:#ff2ea6;" onclick="shareFacebook()">📘</span>
+      <span style="cursor:pointer;color:#ff2ea6;" onclick="shareTwitter()">🐦</span>
+      <span style="cursor:pointer;color:#ff2ea6;" onclick="shareInstagram()">📸</span>
+      <span style="cursor:pointer;color:#ff2ea6;" onclick="shareWhatsApp()">💬</span>
+      <span style="cursor:pointer;color:#ff2ea6;" onclick="copyLink()">🔗</span>
     </div>
 
   </div>
@@ -245,57 +200,52 @@ function openPromo(title,subtitle,shazams,img,list=null){
 
   document.body.appendChild(overlay)
 
-  async function getPromoImage(){
-    let area=document.getElementById("exportArea")
-    let canvas=await html2canvas(area,{
+  async function getImage(){
+    let canvas=await html2canvas(document.getElementById("exportArea"),{
       backgroundColor:"#000",
-      scale:2,
-      useCORS:true
+      scale:2
     })
     return canvas.toDataURL("image/png")
   }
 
-  window.toggleShareOptions=()=>{
-    let box=document.getElementById("shareOptions")
-    box.style.display = box.style.display==="none" ? "block" : "none"
-  }
-
   window.shareFacebook=async()=>{
-    let url=encodeURIComponent(location.href)
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`,"_blank")
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,
+      "_blank"
+    )
   }
 
   window.shareTwitter=async()=>{
-    let url=encodeURIComponent(location.href)
-    let text=encodeURIComponent(title+" — "+exact(shazams)+" Shazams")
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`,"_blank")
+    window.open(
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(title+" - "+exact(shazams)+" Shazams")}`,
+      "_blank"
+    )
   }
 
-  window.shareWhatsApp=()=>{
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title+" "+location.href)}`,"_blank")
+  window.shareWhatsApp=async()=>{
+    window.open(
+      `https://api.whatsapp.com/send?text=${encodeURIComponent(title+" - "+exact(shazams)+" Shazams "+location.href)}`,
+      "_blank"
+    )
   }
 
-  window.shareInstagramPost=async()=>{
-    let img=await getPromoImage()
-    let a=document.createElement("a")
-    a.href=img
-    a.download="blackpink-promo.png"
-    a.click()
-    alert("Image downloaded. Upload it to Instagram post.")
-  }
-
-  window.shareInstagramStory=async()=>{
-    let img=await getPromoImage()
-    let a=document.createElement("a")
-    a.href=img
-    a.download="blackpink-story.png"
-    a.click()
-    alert("Image downloaded. Share it to Instagram Story.")
-  }
-
-  window.copyPageLink=()=>{
+  window.copyLink=()=>{
     navigator.clipboard.writeText(location.href)
-    alert("Link copied!")
+  }
+
+  window.shareInstagram=async()=>{
+    let canvas=await html2canvas(document.getElementById("exportArea"),{
+      backgroundColor:"#000",
+      scale:2
+    })
+    canvas.toBlob(blob=>{
+      let file=new File([blob],"blackpink.png",{type:"image/png"})
+      if(navigator.share){
+        navigator.share({files:[file]})
+      }else{
+        alert("Instagram sharing works on supported mobile browsers only.")
+      }
+    })
   }
 }
 
