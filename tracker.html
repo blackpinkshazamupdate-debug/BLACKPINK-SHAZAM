@@ -197,6 +197,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 let songs=[]
 let confettiActive=[]
 let previousMilestones={}
+let milestonePopupActive=false
 
 function exact(n){ return Number(n).toLocaleString() }
 
@@ -225,7 +226,7 @@ function launchConfetti(){
   c.className="confetti-piece"
   let img=images[Math.floor(Math.random()*images.length)]
   c.style.backgroundImage=`url('${img}')`
-  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 20px #ff2ea6)"
+  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
   c.style.left=Math.random()*window.innerWidth+"px"
   c.style.top="-60px"
   c.style.opacity="1"
@@ -249,7 +250,7 @@ function animateConfetti(el){
   el.style.transform=`rotate(${rotation}deg)`
   el.style.opacity=Math.max(0,1-(elapsed/15000))
   
-  if(top<window.innerHeight+80 && elapsed<15000){
+  if(top<window.innerHeight+80 && elapsed<15000 && !milestonePopupActive){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -260,13 +261,14 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
+ milestonePopupActive=true
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
- pop.innerHTML="<span class='milestone-close' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
+ pop.innerHTML="<span class='milestone-close' onclick='milestonePopupActive=false;this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
+ setTimeout(()=>{if(pop.parentNode){milestonePopupActive=false;pop.remove()}},15000)
 }
 
 async function exportImage(){
@@ -433,9 +435,7 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  if(songs && songs["Last Update"]) {
-    document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
-  }
+  document.getElementById("updated").innerText="Last Updated: "+(songs && songs["Last Update"] ? songs["Last Update"] : "")
  }})
 </script>
 
