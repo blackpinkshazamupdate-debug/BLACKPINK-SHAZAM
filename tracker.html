@@ -179,8 +179,8 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 <body>
 
 <header>BLACKPINK Shazam Tracker</header>
-<div class="updated" id="updated"></div>
-<div id="content"></div>
+<div class="updated" id="updated">Loading...</div>
+<div id="content">Loading data...</div>
 
 <script>
 let songs=[]
@@ -439,14 +439,43 @@ function build(){
  checkMilestones()
 }
 
-Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
- complete:function(res){
-  songs=res.data.filter(s=>s.Song)
-  build()
-  // Correzione per "Last Updated: undefined"
-  let lastUpdate = songs?.["Last Update"] || "Unknown"
-  document.getElementById("updated").innerText="Last Updated: "+lastUpdate
- }})
+// Caricamento sicuro del CSV
+Papa.parse("blackpink.csv",{
+  download: true,
+  header: true,
+  dynamicTyping: true,
+  complete: function(res){
+    if(res.errors.length > 0){
+      document.getElementById("content").innerHTML = "<p style='color:red;text-align:center;'>Error loading data. Please check your CSV file.</p>"
+      document.getElementById("updated").innerText = "Error loading data"
+      return
+    }
+    
+    songs = res.data.filter(s => s.Song && s.Song.trim() !== "")
+    
+    if(songs.length === 0){
+      document.getElementById("content").innerHTML = "<p style='color:yellow;text-align:center;'>No songs found in CSV. Please check your file format.</p>"
+      document.getElementById("updated").innerText = "No data"
+      return
+    }
+    
+    build()
+    
+    // Gestione sicura di "Last Update"
+    let lastUpdate = "Unknown"
+    if(songs && songs["Last Update"]){
+      lastUpdate = songs["Last Update"]
+    } else if(songs && songs.LastUpdate){
+      lastUpdate = songs.LastUpdate
+    }
+    
+    document.getElementById("updated").innerText = "Last Updated: " + lastUpdate
+  },
+  error: function(error){
+    document.getElementById("content").innerHTML = "<p style='color:red;text-align:center;'>Failed to load CSV: " + error + "</p>"
+    document.getElementById("updated").innerText = "Load failed"
+  }
+})
 </script>
 
 </body>
