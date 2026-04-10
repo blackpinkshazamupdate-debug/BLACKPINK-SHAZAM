@@ -186,6 +186,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 let songs=[]
 let confettiActive=[]
 let previousMilestones={}
+let milestonePopupActive = false
 
 function exact(n){ return Number(n).toLocaleString() }
 
@@ -237,9 +238,9 @@ function animateConfetti(el){
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
-  el.style.opacity=Math.max(0,1-(elapsed/5000))
+  el.style.opacity=Math.max(0,1-(elapsed/8000))
   
-  if(top<window.innerHeight+80 && elapsed<5000){
+  if(top<window.innerHeight+80 && elapsed<8000 && !milestonePopupActive){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -250,15 +251,22 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
+ milestonePopupActive = true
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
  pop.innerHTML="<b>🎉 Milestones reached!</b><br><br>"+
  list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")+
- "<br><button class='download-btn' onclick='this.parentNode.remove()'>Close</button>"
+ "<br><button class='download-btn' onclick='closeMilestonePopup()'>Close</button>"
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},6000)
+ setTimeout(()=>{if(pop.parentNode) closeMilestonePopup()},8000)
+}
+
+function closeMilestonePopup(){
+ milestonePopupActive = false
+ let pop = document.querySelector(".milestone-popup")
+ if(pop) pop.remove()
 }
 
 /* EXPORT */
@@ -273,7 +281,12 @@ async function nativeShare(title){
  let blob=await exportImage()
  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
  if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
+   await navigator.share({
+     files: [file],
+     title: "BLACKPINK Shazam Tracker",
+     text: `Check out ${title} — ${exact(songs.find(s=>s.Song===title)?.Shazams || 0} Shazams`,
+     url: location.href
+   })
  } else {
    downloadPromo()
  }
@@ -430,7 +443,9 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
+  // Correzione per "Last Updated: undefined"
+  let lastUpdate = songs?.["Last Update"] || "Unknown"
+  document.getElementById("updated").innerText="Last Updated: "+lastUpdate
  }})
 </script>
 
