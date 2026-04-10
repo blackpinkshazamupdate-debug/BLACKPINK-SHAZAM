@@ -134,7 +134,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   left:50%;
   transform:translateX(-50%);
   background:rgba(0,0,0,0.9);
-  padding:15px;
+  padding:10px 15px;
   border-radius:14px;
   z-index:9999;
   border:1px solid #ff2ea6;
@@ -160,7 +160,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   padding:5px 10px;
   border:1px solid rgba(255,46,166,0.3);
   border-radius:6px;
-  margin:5px;
+  font-size:14px;
 }
 
 .confetti-piece{
@@ -258,7 +258,7 @@ function showMilestonePopup(list){
  pop.innerHTML="<b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) closeMilestone()},15000)
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
 }
 
 function closeMilestone(){
@@ -436,9 +436,7 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  let lastUpdate = "Unknown"
-  if(songs && songs["Last Update"]) lastUpdate = songs["Last Update"]
-  document.getElementById("updated").innerText="Last Updated: "+lastUpdate
+  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
  }})
 </script>
 
