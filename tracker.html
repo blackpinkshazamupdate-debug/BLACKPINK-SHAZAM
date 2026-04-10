@@ -426,11 +426,14 @@ function build(){
    c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
  })
  checkMilestones()
+ console.log("Build completed, songs count:", songs.length)
+ console.log("First song:", songs)
 }
 
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
+  console.log("CSV loaded, total songs:", songs.length)
   build()
   document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
  }})
