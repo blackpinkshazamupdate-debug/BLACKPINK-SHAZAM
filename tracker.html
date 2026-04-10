@@ -179,14 +179,14 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 <body>
 
 <header>BLACKPINK Shazam Tracker</header>
-<div class="updated" id="updated">Loading...</div>
-<div id="content">Loading data...</div>
+<div class="updated" id="updated"></div>
+<div id="content"></div>
 
 <script>
 let songs=[]
 let confettiActive=[]
 let previousMilestones={}
-let milestonePopupActive = false
+let milestonePopupActive=false
 
 function exact(n){ return Number(n).toLocaleString() }
 
@@ -208,7 +208,6 @@ function milestoneText(v){
  return (v/1000)+"k"
 }
 
-/* CONFETTI */
 function launchConfetti(){
  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
  for(let i=0;i<40;i++){
@@ -251,42 +250,35 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
- milestonePopupActive = true
+ milestonePopupActive=true
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
  pop.innerHTML="<b>🎉 Milestones reached!</b><br><br>"+
  list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")+
- "<br><button class='download-btn' onclick='closeMilestonePopup()'>Close</button>"
+ "<br><button class='download-btn' onclick='closeMilestone()'>Close</button>"
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) closeMilestonePopup()},8000)
+ setTimeout(()=>{if(pop.parentNode) closeMilestone()},8000)
 }
 
-function closeMilestonePopup(){
- milestonePopupActive = false
- let pop = document.querySelector(".milestone-popup")
+function closeMilestone(){
+ milestonePopupActive=false
+ let pop=document.querySelector(".milestone-popup")
  if(pop) pop.remove()
 }
 
-/* EXPORT */
 async function exportImage(){
  let area=document.getElementById("exportArea")
  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
  return new Promise(resolve=>canvas.toBlob(resolve))
 }
 
-/* SHARE */
 async function nativeShare(title){
  let blob=await exportImage()
  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
  if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({
-     files: [file],
-     title: "BLACKPINK Shazam Tracker",
-     text: `Check out ${title} — ${exact(songs.find(s=>s.Song===title)?.Shazams || 0} Shazams`,
-     url: location.href
-   })
+   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
  } else {
    downloadPromo()
  }
@@ -307,7 +299,6 @@ async function downloadPromo(){
  a.click()
 }
 
-/* SHARE ICON SVG */
 function shareSVG(){
  return `
  <svg class="share-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
@@ -385,11 +376,9 @@ function createSection(name,list){
 
  let content=div.querySelector(".section-content")
  list.forEach((s,i)=>{
-  // Solo nella TOP 10 mostro il rank
   if(name === "GLOBAL TOP 10") {
    content.appendChild(createSong(s,i+1))
   } else {
-   // Per le altre sezioni, rimuovo il rank
    let songDiv = createSong(s,i+1)
    songDiv.querySelector(".rank").remove()
    content.appendChild(songDiv)
@@ -439,43 +428,12 @@ function build(){
  checkMilestones()
 }
 
-// Caricamento sicuro del CSV
-Papa.parse("blackpink.csv",{
-  download: true,
-  header: true,
-  dynamicTyping: true,
-  complete: function(res){
-    if(res.errors.length > 0){
-      document.getElementById("content").innerHTML = "<p style='color:red;text-align:center;'>Error loading data. Please check your CSV file.</p>"
-      document.getElementById("updated").innerText = "Error loading data"
-      return
-    }
-    
-    songs = res.data.filter(s => s.Song && s.Song.trim() !== "")
-    
-    if(songs.length === 0){
-      document.getElementById("content").innerHTML = "<p style='color:yellow;text-align:center;'>No songs found in CSV. Please check your file format.</p>"
-      document.getElementById("updated").innerText = "No data"
-      return
-    }
-    
-    build()
-    
-    // Gestione sicura di "Last Update"
-    let lastUpdate = "Unknown"
-    if(songs && songs["Last Update"]){
-      lastUpdate = songs["Last Update"]
-    } else if(songs && songs.LastUpdate){
-      lastUpdate = songs.LastUpdate
-    }
-    
-    document.getElementById("updated").innerText = "Last Updated: " + lastUpdate
-  },
-  error: function(error){
-    document.getElementById("content").innerHTML = "<p style='color:red;text-align:center;'>Failed to load CSV: " + error + "</p>"
-    document.getElementById("updated").innerText = "Load failed"
-  }
-})
+Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
+ complete:function(res){
+  songs=res.data.filter(s=>s.Song)
+  build()
+  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
+ }})
 </script>
 
 </body>
