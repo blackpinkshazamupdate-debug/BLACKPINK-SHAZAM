@@ -141,25 +141,26 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   text-align:center;
   max-width:90%;
   font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 
 .milestone-popup b{
   font-size:16px;
-  display:block;
-  margin-bottom:10px;
+  margin:0;
 }
 
 .milestone-item{
   display:flex;
   align-items:center;
-  gap:10px;
-  margin:5px 0;
-  padding:5px;
-  border-bottom:1px solid rgba(255,46,166,0.3);
-}
-
-.milestone-item:last-child{
-  border-bottom:none;
+  gap:5px;
+  padding:5px 10px;
+  border:1px solid rgba(255,46,166,0.3);
+  border-radius:6px;
+  margin:5px;
 }
 
 .confetti-piece{
@@ -254,9 +255,7 @@ function showMilestonePopup(list){
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
- pop.innerHTML="<b>🎉 Milestones reached!</b><br><br>"+
- list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")+
- "<br><button class='download-btn' onclick='closeMilestone()'>Close</button>"
+ pop.innerHTML="<b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
  setTimeout(()=>{if(pop.parentNode) closeMilestone()},15000)
@@ -278,7 +277,12 @@ async function nativeShare(title){
  let blob=await exportImage()
  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
  if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
+   await navigator.share({
+     files: [file],
+     title: "BLACKPINK Shazam Tracker",
+     text: title,
+     url: location.href
+   })
  } else {
    downloadPromo()
  }
@@ -433,11 +437,7 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
   songs=res.data.filter(s=>s.Song)
   build()
   let lastUpdate = "Unknown"
-  if(songs){
-    if(songs["Last Update"]) lastUpdate = songs["Last Update"]
-    else if(songs.LastUpdate) lastUpdate = songs.LastUpdate
-    else if(songs.lastupdate) lastUpdate = songs.lastupdate
-  }
+  if(songs && songs["Last Update"]) lastUpdate = songs["Last Update"]
   document.getElementById("updated").innerText="Last Updated: "+lastUpdate
  }})
 </script>
