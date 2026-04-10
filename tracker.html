@@ -248,7 +248,7 @@ function animateConfetti(el){
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
   el.style.opacity=Math.max(0,1-(elapsed/15000))
-  if(top<window.innerHeight+80 && elapsed<20000){
+  if(top<window.innerHeight+80 && elapsed<35000){
    requestAnimationFrame(frame)
   } else {
    el.remove()
