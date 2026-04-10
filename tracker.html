@@ -179,8 +179,8 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 <body>
 
 <header>BLACKPINK Shazam Tracker</header>
-<div class="updated" id="updated"></div>
-<div id="content"></div>
+<div class="updated" id="updated">Loading...</div>
+<div id="content">Loading data...</div>
 
 <script>
 let songs=[]
@@ -237,9 +237,9 @@ function animateConfetti(el){
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
-  el.style.opacity=Math.max(0,1-(elapsed/8000))
+  el.style.opacity=Math.max(0,1-(elapsed/15000))
   
-  if(top<window.innerHeight+80 && elapsed<8000 && !milestonePopupActive){
+  if(top<window.innerHeight+80 && elapsed<15000 && !milestonePopupActive){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -259,7 +259,7 @@ function showMilestonePopup(list){
  "<br><button class='download-btn' onclick='closeMilestone()'>Close</button>"
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) closeMilestone()},8000)
+ setTimeout(()=>{if(pop.parentNode) closeMilestone()},15000)
 }
 
 function closeMilestone(){
@@ -432,7 +432,13 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
+  let lastUpdate = "Unknown"
+  if(songs){
+    if(songs["Last Update"]) lastUpdate = songs["Last Update"]
+    else if(songs.LastUpdate) lastUpdate = songs.LastUpdate
+    else if(songs.lastupdate) lastUpdate = songs.lastupdate
+  }
+  document.getElementById("updated").innerText="Last Updated: "+lastUpdate
  }})
 </script>
 
