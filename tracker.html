@@ -20,13 +20,40 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .section{margin:40px 0;position:relative;overflow:hidden;}
 .section-bg{position:absolute;width:100%;height:100%;background-size:cover;background-position:center;filter:blur(12px) brightness(.35);transform:scale(1.2);}
 .section-content{position:relative;padding:30px;}
-.section h2{color:#ff2ea6;font-size:28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.section h2{
+  color:#ff2ea6;
+  font-size:28px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 
-.song{display:flex;align-items:center;gap:15px;padding:10px;margin:8px 0;background:rgba(0,0,0,.55);border-radius:10px;transition:.25s;position:relative;flex-wrap:wrap;}
+/* share icon */
+.share-icon{
+  width:20px;
+  height:20px;
+  cursor:pointer;
+  fill:#ff2ea6;
+  transition:.2s;
+}
+.share-icon:hover{transform:scale(1.2);}
+
+.song{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:10px;
+  margin:8px 0;
+  background:rgba(0,0,0,.55);
+  border-radius:10px;
+  transition:.25s;
+  position:relative;
+}
 .song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2ea6;}
 
 .rank{font-size:20px;width:40px;}
 .song img{width:50px;border-radius:6px;}
+
 .info{flex:1;min-width:120px;}
 
 .bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
@@ -37,39 +64,44 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .song:hover .hoverstats{opacity:1;}
 .song:hover .total-shazams{opacity:0.5;}
 
-.share-icon{
-  cursor:pointer;
-  width:20px;
-  height:20px;
-  fill:#ff2ea6;
-  transition:.2s;
-}
-.share-icon:hover{transform:scale(1.2);}
-
 .overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);
-  display:flex;align-items:center;justify-content:center;
-  z-index:999;padding:20px;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  padding:20px;
 }
 
 .card{
-  background:black;padding:20px;border-radius:12px;
-  width:min(520px,95%);position:relative;
+  background:black;
+  border-radius:12px;
+  width:min(480px,95%);
+  max-height:85vh;
+  overflow-y:auto;
+  padding:20px;
+  position:relative;
 }
 
 .close-x{
-  position:absolute;top:10px;right:15px;
-  font-size:22px;color:#ff2ea6;cursor:pointer;
+  position:absolute;
+  top:10px;
+  right:15px;
+  font-size:22px;
+  color:#ff2ea6;
+  cursor:pointer;
 }
 
 .exportArea{
-  padding:15px;background:black;border-radius:12px;text-align:center;
+  padding:15px;
+  text-align:center;
 }
 
 .exportArea img{
   width:100%;
   height:auto;
-  max-height:none;
   object-fit:contain;
   border-radius:10px;
   margin-bottom:10px;
@@ -78,7 +110,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .socials{
   display:flex;
   justify-content:center;
-  gap:15px;
+  gap:18px;
   margin-top:15px;
   flex-wrap:wrap;
 }
@@ -91,23 +123,32 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .socials img:hover{transform:scale(1.2);}
 
 .copy-btn{
-  background:#ff2ea6;border:none;color:white;
-  padding:6px 10px;border-radius:6px;cursor:pointer;
+  background:#ff2ea6;
+  border:none;
+  color:white;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
 }
 
 .milestone-popup{
-  position:fixed;bottom:20px;left:50%;
+  position:fixed;
+  bottom:20px;
+  left:50%;
   transform:translateX(-50%);
   background:rgba(0,0,0,0.9);
-  padding:20px;border-radius:14px;
-  z-index:9999;border:1px solid #ff2ea6;
+  padding:20px;
+  border-radius:14px;
+  z-index:9999;
+  border:1px solid #ff2ea6;
 }
 
 .confetti-piece{
   position:fixed;
   pointer-events:none;
   z-index:10000;
-  width:60px;height:60px;
+  width:60px;
+  height:60px;
   background-size:contain;
   background-repeat:no-repeat;
 }
@@ -152,9 +193,7 @@ function launchConfetti(){
   c.className="confetti-piece"
   let img=images[Math.floor(Math.random()*images.length)]
   c.style.backgroundImage=`url(${img})`
-  if(img.includes("bplogo")){
-    c.style.filter="drop-shadow(0 0 10px #ff2ea6)"
-  }
+  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 8px #ff2ea6)"
   c.style.left=Math.random()*window.innerWidth+"px"
   c.style.top="-60px"
   document.body.appendChild(c)
@@ -164,76 +203,36 @@ function launchConfetti(){
 }
 
 function animateConfetti(el){
- let angle=0
  let speed=2+Math.random()*2
- let drift=(Math.random()*2-1)*2
  function frame(){
-  angle+=0.05
   let top=parseFloat(el.style.top)+speed
-  let left=parseFloat(el.style.left)+Math.sin(angle)*drift
   el.style.top=top+"px"
-  el.style.left=left+"px"
-  el.style.transform=`rotate(${angle*180/Math.PI}deg)`
   if(top<window.innerHeight+80) requestAnimationFrame(frame)
  }
  requestAnimationFrame(frame)
 }
 
-function stopConfetti(){
- confettiActive.forEach(c=>c.remove())
- confettiActive=[]
-}
-
-/* SHARE EXPORT */
+/* SHARE SYSTEM */
 async function exportImage(){
  let area=document.getElementById("exportArea")
  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
  return canvas.toDataURL("image/png")
 }
 
-function shareTo(platform){
- exportImage().then(imgData=>{
-  let url=location.href
-  let shareURL=""
-
-  if(platform==="twitter")
-    shareURL=`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`
-  if(platform==="facebook")
-    shareURL=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
-  if(platform==="instagram")
-    shareURL=`https://www.instagram.com/`
-  if(platform==="tiktok")
-    shareURL=`https://www.tiktok.com/upload?lang=en`
-  if(platform==="whatsapp")
-    shareURL=`https://wa.me/?text=${encodeURIComponent(url)}`
-
-  window.open(shareURL,"_blank")
- })
-}
-
-function downloadPromo(){
- exportImage().then(data=>{
-  let a=document.createElement("a")
-  a.href=data
-  a.download="blackpink.png"
-  a.click()
- })
+async function shareTo(platform){
+ let url=location.href
+ let shareURL=""
+ if(platform==="twitter") shareURL=`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`
+ if(platform==="facebook") shareURL=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+ if(platform==="whatsapp") shareURL=`https://wa.me/?text=${encodeURIComponent(url)}`
+ if(platform==="instagram") shareURL=`https://www.instagram.com/`
+ if(platform==="tiktok") shareURL=`https://www.tiktok.com/`
+ window.open(shareURL,"_blank")
 }
 
 function copyLink(){
  navigator.clipboard.writeText(location.href)
  alert("Link copied!")
-}
-
-function shareIconSVG(){
- return `
- <svg class="share-icon" viewBox="0 0 24 24">
- <circle cx="18" cy="5" r="3"/>
- <circle cx="6" cy="12" r="3"/>
- <circle cx="18" cy="19" r="3"/>
- <line x1="8.5" y1="10.5" x2="15.5" y2="6.5" stroke="#ff2ea6" stroke-width="2"/>
- <line x1="8.5" y1="13.5" x2="15.5" y2="17.5" stroke="#ff2ea6" stroke-width="2"/>
- </svg>`
 }
 
 function openPromo(title,subtitle,shazams,img,list=null){
@@ -249,6 +248,7 @@ function openPromo(title,subtitle,shazams,img,list=null){
  overlay.innerHTML=`
  <div class="card">
   <div class="close-x" onclick="this.closest('.overlay').remove()">✕</div>
+
   <div id="exportArea" class="exportArea">
    <img src="${img}">
    <h2 style="color:#ff2ea6">${title}</h2>
@@ -262,11 +262,22 @@ function openPromo(title,subtitle,shazams,img,list=null){
    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="shareTo('instagram')">
    <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" onclick="shareTo('tiktok')">
    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" onclick="shareTo('whatsapp')">
-   <img src="https://cdn-icons-png.flaticon.com/512/60/60710.png" onclick="downloadPromo()">
-   <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+   <button class="copy-btn" onclick="copyLink()">Copy</button>
   </div>
  </div>`
  document.body.appendChild(overlay)
+}
+
+/* SHARE SVG ICON */
+function shareSVG(){
+ return `
+ <svg class="share-icon" viewBox="0 0 24 24">
+  <circle cx="18" cy="5" r="3"/>
+  <circle cx="6" cy="12" r="3"/>
+  <circle cx="18" cy="19" r="3"/>
+  <line x1="8.7" y1="13.4" x2="15.3" y2="17.6" stroke="#ff2ea6" stroke-width="2"/>
+  <line x1="15.3" y1="6.4" x2="8.7" y2="10.6" stroke="#ff2ea6" stroke-width="2"/>
+ </svg>`
 }
 
 function createSong(s,rank){
@@ -279,12 +290,11 @@ function createSong(s,rank){
   ${s.Song}
   <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
   <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-  <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}%</div>
+  <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
  </div>
- ${shareIconSVG()}
+ ${shareSVG()}
  `
- div.querySelector(".share-icon").onclick=
- ()=>openPromo(s.Song,"",s.Shazams,'images/'+s.ImageFile)
+ div.querySelector("svg").onclick=()=>openPromo(s.Song,"",s.Shazams,"images/"+s.ImageFile)
  return div
 }
 
@@ -292,26 +302,19 @@ function createSection(name,list){
  let div=document.createElement("div")
  div.className="section"
  let total=list.reduce((a,b)=>a+b.Shazams,0)
- let safeList=encodeURIComponent(JSON.stringify(list))
  let promoImage=sectionImage(name)
 
  div.innerHTML=`
  <div class="section-bg" style="background-image:url('${promoImage}')"></div>
  <div class="section-content">
-  <h2>${name} ${shareIconSVG()}</h2>
+  <h2>${name} ${shareSVG()}</h2>
  </div>`
 
- div.querySelector(".share-icon").onclick=
- ()=>openSectionPromo(name,total,promoImage,safeList)
+ div.querySelector("svg").onclick=()=>openPromo(name,"",total,promoImage,list)
 
  let content=div.querySelector(".section-content")
  list.forEach((s,i)=>content.appendChild(createSong(s,i+1)))
  return div
-}
-
-function openSectionPromo(name,total,img,encoded){
- let list=JSON.parse(decodeURIComponent(encoded))
- openPromo(name,"",total,img,list)
 }
 
 function sectionImage(name){
