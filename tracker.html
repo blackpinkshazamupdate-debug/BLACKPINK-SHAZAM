@@ -164,7 +164,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   font-size:14px;
 }
 
-.milestone-close{
+.milestone-close-x{
   position:absolute;
   top:5px;
   right:8px;
@@ -190,14 +190,13 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 <body>
 
 <header>BLACKPINK Shazam Tracker</header>
-<div class="updated" id="updated">Loading...</div>
-<div id="content">Loading data...</div>
+<div class="updated" id="updated"></div>
+<div id="content"></div>
 
 <script>
 let songs=[]
 let confettiActive=[]
 let previousMilestones={}
-let milestonePopupActive=false
 
 function exact(n){ return Number(n).toLocaleString() }
 
@@ -250,7 +249,7 @@ function animateConfetti(el){
   el.style.transform=`rotate(${rotation}deg)`
   el.style.opacity=Math.max(0,1-(elapsed/15000))
   
-  if(top<window.innerHeight+80 && elapsed<15000 && !milestonePopupActive){
+  if(top<window.innerHeight+80 && elapsed<15000){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -261,20 +260,13 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
- milestonePopupActive=true
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
- pop.innerHTML="<span class='milestone-close' onclick='this.parentNode.remove();milestonePopupActive=false;'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
+ pop.innerHTML="<span class='milestone-close-x' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) {pop.remove();milestonePopupActive=false;}},15000)
-}
-
-function closeMilestone(){
- milestonePopupActive=false
- let pop=document.querySelector(".milestone-popup")
- if(pop) pop.remove()
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
 }
 
 async function exportImage(){
@@ -287,12 +279,7 @@ async function nativeShare(title){
  let blob=await exportImage()
  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
  if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({
-     files: [file],
-     title: "BLACKPINK Shazam Tracker",
-     text: title,
-     url: location.href
-   })
+   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
  } else {
    downloadPromo()
  }
