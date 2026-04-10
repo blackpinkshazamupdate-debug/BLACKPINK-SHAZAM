@@ -248,8 +248,7 @@ function animateConfetti(el){
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
   el.style.opacity=Math.max(0,1-(elapsed/15000))
-  
-  if(top<window.innerHeight+80 && elapsed<15000){
+  if(top<window.innerHeight+80 && elapsed<20000){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -266,7 +265,7 @@ function showMilestonePopup(list){
  pop.innerHTML="<span class='milestone-close-x' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},20000)
 }
 
 async function exportImage(){
