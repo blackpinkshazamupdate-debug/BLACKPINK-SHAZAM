@@ -271,6 +271,12 @@ function showMilestonePopup(list){
  setTimeout(()=>{if(pop.parentNode) {pop.remove();milestonePopupActive=false;}},15000)
 }
 
+function closeMilestone(){
+ milestonePopupActive=false
+ let pop=document.querySelector(".milestone-popup")
+ if(pop) pop.remove()
+}
+
 async function exportImage(){
  let area=document.getElementById("exportArea")
  let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
@@ -278,16 +284,17 @@ async function exportImage(){
 }
 
 async function nativeShare(title){
- try{
-  let blob=await exportImage()
-  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
-  if(navigator.canShare({files:[file]})){
-    await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title})
-  } else {
-    downloadPromo()
-  }
- }catch(e){
-  downloadPromo()
+ let blob=await exportImage()
+ let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
+ if(navigator.canShare && navigator.canShare({files:[file]})){
+   await navigator.share({
+     files: [file],
+     title: "BLACKPINK Shazam Tracker",
+     text: title,
+     url: location.href
+   })
+ } else {
+   downloadPromo()
  }
 }
 
