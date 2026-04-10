@@ -162,6 +162,15 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   border-bottom:none;
 }
 
+.milestone-close{
+  position:absolute;
+  top:8px;
+  right:12px;
+  font-size:20px;
+  color:#ff2ea6;
+  cursor:pointer;
+}
+
 .confetti-piece{
   position:fixed;
   pointer-events:none;
@@ -214,7 +223,7 @@ function launchConfetti(){
   c.className="confetti-piece"
   let img=images[Math.floor(Math.random()*images.length)]
   c.style.backgroundImage=`url('${img}')`
-  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 20px #ff2ea6)"
+  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
   c.style.left=Math.random()*window.innerWidth+"px"
   c.style.top="-60px"
   c.style.opacity="1"
@@ -232,7 +241,7 @@ function animateConfetti(el){
  
  function frame(){
   let elapsed=Date.now()-startTime
-  let=parseFloat(el.style.top)+speed
+  let top=parseFloat(el.style.top)+speed
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
@@ -252,9 +261,8 @@ function showMilestonePopup(list){
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
- pop.innerHTML="<b>🎉 Milestones reached!</b><br><br>"+
- list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")+
- "<br><button class='download-btn' onclick='this.parentNode.remove()'>Close</button>"
+ pop.innerHTML="<span class='milestone-close' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b><br><br>"+
+ list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
  setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
@@ -267,12 +275,16 @@ async function exportImage(){
 }
 
 async function nativeShare(title){
- let blob=await exportImage()
- let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
- if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title})
- } else {
-   downloadPromo()
+ try{
+  let blob=await exportImage()
+  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
+  if(navigator.canShare({files:[file]})){
+    await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title})
+  } else {
+    downloadPromo()
+  }
+ }catch(e){
+  downloadPromo()
  }
 }
 
@@ -424,7 +436,8 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
+  let lastUpdate = songs && songs["Last Update"] ? songs["Last Update"] : ""
+  document.getElementById("updated").innerText="Last Updated: "+lastUpdate
  }})
 </script>
 
