@@ -407,11 +407,13 @@ function checkMilestones(){
  songs.forEach(s=>{
   let current=lastMilestone(s.Shazams)
   let prev=previousMilestones[s.Song]||0
+  console.log(s.Song, "current:", current, "prev:", prev)
   if(current>prev && current>0){
    reached.push(s)
    previousMilestones[s.Song]=current
   }
  })
+ console.log("Reached:", reached.length)
  if(reached.length>0) showMilestonePopup(reached)
 }
 
