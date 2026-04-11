@@ -427,7 +427,25 @@ function build(){
  })
  checkMilestones()
 }
+console.log("Script started")
 
+Papa.parse("blackpink.csv",{
+ download:true,
+ header:true,
+ dynamicTyping:true,
+ complete:function(res){
+  console.log("CSV parse complete")
+  console.log("Errors:", res.errors)
+  console.log("Data rows:", res.data.length)
+  songs=res.data.filter(s=>s.Song)
+  console.log("Filtered songs:", songs.length)
+  build()
+  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
+ },
+ error:function(err){
+  console.log("CSV parse error:", err)
+ }
+})
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
