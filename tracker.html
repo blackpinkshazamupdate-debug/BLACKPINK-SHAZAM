@@ -259,13 +259,15 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
+ console.log("SHOWING POPUP WITH", list.length, "milestones")
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
  pop.innerHTML="<span class='milestone-close-x' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
+ console.log("Popup added to DOM")
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},20000)
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},35000)
 }
 
 async function exportImage(){
