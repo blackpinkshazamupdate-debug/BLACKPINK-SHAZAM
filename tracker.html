@@ -31,7 +31,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .share-icon{
   width:20px;
   height:20px;
-  cursor:pointer;
+  your cursor:pointer;
   fill:#ff2ea6;
   transition:.2s;
 }
@@ -48,7 +48,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   transition:.25s;
   position:relative;
 }
-.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2ea6;}
+.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2a6;}
 
 .rank{font-size:20px;width:40px;}
 .song img{width:50px;border-radius:6px;}
@@ -59,9 +59,9 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .bar span{display:block;height:100%;background:#ff2ea6;}
 
 .total-shazams{font-size:12px;opacity:.7;margin-top:3px;}
-.hoverstats{font-size:12px;opacity:0;transition:.2s;margin-top:5px;}
-.song:hover .hoverstats{opacity:1;}
-.song:hover .total-shazams{opacity:0.5;}
+.hoverstats{font-size:12px;opacity=0;transition=.2s;margin-top=5px;}
+.song:hover .hoverstats{opacity=1;}
+.song:hover .total-shazams{opacity=0.5;}
 
 .overlay{
   position:fixed;
@@ -70,24 +70,23 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index:999;
-  padding:20px;
+  z-index=999;
 }
 
 .card{
   background:black;
-  border-radius:12px;
-  width:min(440px,92%);
-  padding:20px;
+  border-radius=12px;
+  width=min(440px,92%);
+  padding=20px;
   position:relative;
 }
 
 .close-x{
   position:absolute;
-  top:10px;
-  right:15px;
-  font-size:22px;
-  color:#ff2ea6;
+  top=10px;
+  right=15px;
+  font-size=22px;
+  color=#ff2ea6;
   cursor:pointer;
 }
 
@@ -96,74 +95,74 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 }
 
 .exportArea img{
-  width:100%;
-  height:auto;
-  object-fit:contain;
-  border-radius:10px;
-  margin-bottom:10px;
-  max-height:220px;
+  width=100%;
+  height=auto;
+  object-fit=contain;
+  border-radius=10px;
+  margin-bottom=10px;
+  max-height=220px;
 }
 
 .socials{
   display:flex;
-  justify-content:center;
-  gap:18px;
-  margin-top:15px;
-  flex-wrap:wrap;
+  justify-content=center;
+  gap=18px;
+  margin-top=15px;
+  flex-wrap=wrap;
 }
 
 .socials img{
-  width:30px;
+  width=30px;
   cursor:pointer;
-  transition:.2s;
+  transition=.2s;
 }
-.socials img:hover{transform:scale(1.2);}
+.socials img:hover{transform=scale(1.2);}
 
 .download-btn{
-  background:#ff2ea6;
-  border:none;
-  color:white;
-  padding:6px 12px;
-  border-radius:6px;
+  background=#ff2ea6;
+  border=none;
+  color=white;
+  padding=6px 12px;
+  border-radius=6px;
   cursor:pointer;
 }
 
 .milestone-popup{
   position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.95);
-  padding:15px 20px;
-  border-radius:16px;
-  z-index:9999;
-  border:2px solid #ff2ea6;
-  text-align:center;
-  max-width:92%;
-  font-size:16px;
+  bottom=20px;
+  left=50%;
+  transform=translateX(-50%);
+  background=rgba(0,0,0,0.95);
+  padding=15px 20px;
+  border-radius=16px;
+  z-index=9999;
+  border=2px solid #ff2ea6;
+  text-align=center;
+  max-width=92%;
+  font-size=16px;
   display:flex;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-  justify-content:center;
+  align-items=center;
+  gap=15px;
+  flex-wrap=wrap;
+  justify-content=center;
   position:relative;
-  box-shadow:0 0 30px rgba(255,46,166,0.5);
+  box-shadow=0 0 30px rgba(255,46,166,0.5);
 }
 
 .milestone-popup b{
-  font-size:18px;
-  margin:0;
+  font-size=18px;
+  margin=0;
 }
 
 .milestone-item{
   display:flex;
-  align-items:center;
+  align-items=center;
   gap=8px;
-  padding:8px 14px;
-  border:1px solid rgba(255,46,166,0.5);
-  border-radius:8px;
-  font-size:15px;
-  background:rgba(255,46,166,0.1);
+  padding=8px 14px;
+  border=1px solid rgba(255,46,166,0.5);
+  border-radius=8px;
+  font-size=15px;
+  background=rgba(255,46,166,0.1);
 }
 
 .milestone-close-x{
@@ -233,11 +232,9 @@ function launchConfetti(){
   c.style.opacity="0.95"
   document.body.appendChild(c)
   animateConfetti(c)
-  confettiTest=true
+  confettiActive.push(c)
  }
 }
-
-let confettiTest=false
 
 function animateConfetti(el){
  let speed=4+Math.random()*3
