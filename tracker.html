@@ -48,7 +48,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   transition:.25s;
   position:relative;
 }
-.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2ea6;}
+.song:hover{transform:scale(1.03);box-shadow:0 0 15px #ff2a6;}
 
 .rank{font-size:20px;width:40px;}
 .song img{width:50px;border-radius:6px;}
@@ -58,10 +58,10 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
 .bar span{display:block;height:100%;background:#ff2ea6;}
 
-.total-shazams{font-size:12px;opacity:.7;margin-top:3px;}
-.hoverstats{font-size:12px;opacity:0;transition:.2s;margin-top:5px;}
-.song:hover .hoverstats{opacity:1;}
-.song:hover .total-shazams{opacity:0.5;}
+.total-shazams{font-size=12px;opacity=.7;margin-top=3px;}
+.hoverstats{font-size=12px;opacity=0;transition=.2s;margin-top=5px;}
+.song:hover .hoverstats{opacity=1;}
+.song:hover .total-shazams{opacity=.5;}
 
 .overlay{
   position:fixed;
@@ -76,113 +76,115 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 
 .card{
   background:black;
-  border-radius:12px;
-  width:min(440px,92%);
-  padding:20px;
+  border-radius=12px;
+  width=min(440px,92%);
+  padding=20px;
   position:relative;
 }
 
 .close-x{
   position:absolute;
-  top:10px;
-  right:15px;
-  font-size:22px;
-  color:#ff2ea6;
+  top=10px;
+  right=15px;
+  font-size=22px;
+  color=#ff2ea6;
   cursor:pointer;
 }
 
 .exportArea{
-  text-align:center;
+  text-align=center;
 }
 
 .exportArea img{
-  width:100%;
-  height:auto;
-  object-fit:contain;
-  border-radius:10px;
-  margin-bottom:10px;
-  max-height:220px;
+  width=100%;
+  height=auto;
+  object-fit=contain;
+  border-radius=10px;
+  margin-bottom=10px;
+  max-height=220px;
 }
 
 .socials{
   display:flex;
-  justify-content:center;
-  gap:18px;
-  margin-top:15px;
-  flex-wrap:wrap;
+  justify-content=center;
+  gap=18px;
+  margin-top=15px;
+  flex-wrap=wrap;
 }
 
 .socials img{
-  width:30px;
+  width=30px;
   cursor:pointer;
-  transition:.2s;
+  transition=.2s;
 }
-.socials img:hover{transform:scale(1.2);}
+.socials img:hover{transform=scale(1.2);}
 
 .download-btn{
-  background:#ff2ea6;
-  border:none;
-  color:white;
-  padding:6px 12px;
-  border-radius:6px;
+  background=#ff2ea6;
+  border=none;
+  color=white;
+  padding=6px 12px;
+  border-radius=6px;
   cursor:pointer;
 }
 
 .milestone-popup{
   position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.9);
-  padding:10px 15px;
-  border-radius:14px;
-  z-index:9999;
+  bottom=20px;
+  left=50%;
+  transform=translateX(-50%);
+  background=rgba(0,0,0,0.9);
+  padding=10px 15px;
+  border-radius=14px;
+  z-index=9999;
+  open:0;
   border:1px solid #ff2ea6;
-  text-align:center;
-  max-width:90%;
-  font-size:14px;
+  text-align=center;
+  max-width=90%;
+  font-size=14px;
   display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:center;
+  align-items=center;
+  gap=10px;
+  flex-wrap=wrap;
+  justify-content=center;
   position:relative;
+  box-shadow=0 0 30px rgba(255,46,166,0.5);
 }
 
 .milestone-popup b{
-  font-size:16px;
-  margin:0;
+  font-size=16px;
+  margin=0;
 }
 
 .milestone-item{
   display:flex;
-  align-items:center;
-  gap:5px;
+  align-items=center;
+  the gap:5px;
   padding:5px 10px;
   border:1px solid rgba(255,46,166,0.3);
-  border-radius:6px;
-  font-size:14px;
+  border-radius=6px;
+  font-size=14px;
 }
 
 .milestone-close-x{
   position:absolute;
-  top:5px;
-  right:8px;
-  font-size:18px;
-  color:#ff2ea6;
-  cursor:pointer;
+  top=5px;
+  right=8px;
+  font-size=18px;
+  color=#ff2ea6;
+  cursor=pointer;
 }
 
 .confetti-piece{
   position:fixed;
   pointer-events:none;
-  z-index:10000;
+  z-index=10000;
   width:60px;
   height:60px;
-  background-size:contain;
-  background-repeat:no-repeat;
-  background-position:center;
-  opacity:1;
+  background-size=contain;
+  background-repeat=no-repeat;
+  background-position=center;
+  opacity=1;
 }
 </style>
 </head>
@@ -191,7 +193,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 
 <header>BLACKPINK Shazam Tracker</header>
 <div class="updated" id="updated"></div>
-<div id="content"></div>
+<content id="content"></content>
 
 <script>
 let songs=[]
@@ -242,7 +244,7 @@ function animateConfetti(el){
  let startTime=Date.now()
  
  function frame(){
-  let elapsed=Date.now()-startTime
+  let elapsed=Time.now()-startTime
   let top=parseFloat(el.style.top)+speed
   rotation+=rotationSpeed
   el.style.top=top+"px"
@@ -263,200 +265,10 @@ function showMilestonePopup(list){
  launchConfetti()
  let pop=document.createElement("div")
  pop.className="milestone-popup"
- pop.innerHTML="<span class='milestone-close-x' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
+ pop.innerHTML="<span class='milestone-close-x' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b> "+list.map(s=>`<div class='milestone-text'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  console.log("Popup added to DOM")
  
  setTimeout(()=>{if(pop.parentNode) pop.remove()},35000)
 }
-
-async function exportImage(){
- let area=document.getElementById("exportArea")
- let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
- return new Promise(resolve=>canvas.toBlob(resolve))
-}
-
-async function nativeShare(title){
- let blob=await exportImage()
- let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
- if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
- } else {
-   downloadPromo()
- }
-}
-
-function shareTo(platform,title){
- let url=location.href
- if(platform==="x") window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent('Check out '+title+' on BLACKPINK Shazam Tracker!')}`,"_blank")
- if(platform==="facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,"_blank")
- if(platform==="instagram"||platform==="tiktok") nativeShare(title)
-}
-
-async function downloadPromo(){
- let blob=await exportImage()
- let a=document.createElement("a")
- a.href=URL.createObjectURL(blob)
- a.download="blackpink-tracker.png"
- a.click()
-}
-
-function shareSVG(){
- return `
- <svg class="share-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
-  <circle cx="18" cy="5" r="3"/>
-  <circle cx="6" cy="12" r="3"/>
-  <circle cx="18" cy="19" r="3"/>
-  <line x1="8.7" y1="13.4" x2="15.3" y2="17.6"/>
-  <line x1="15.3" y1="6.4" x2="8.7" y2="10.6"/>
- </svg>`
-}
-
-function openPromo(title,subtitle,shazams,img,list=null){
- let contentHTML=""
- if(list){
-  contentHTML+="<div style='text-align:left;margin-top:10px;'>"
-  list.forEach((s,i)=>{contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>`})
-  contentHTML+="</div>"
- }
-
- let overlay=document.createElement("div")
- overlay.className="overlay"
- overlay.innerHTML=`
- <div class="card">
-  <div class="close-x" onclick="this.closest('.overlay').remove()">✕</div>
-
-  <div id="exportArea" class="exportArea">
-   <img src="${img}" alt="${title}">
-   <h2 style="color:#ff2ea6">${title}</h2>
-   <p>${exact(shazams)} Shazams</p>
-   ${contentHTML}
-  </div>
-
-  <div class="socials">
-   <img src="https://cdn.simpleicons.org/x/ffffff" alt="X" onclick="shareTo('x','${title}')">
-   <img src="https://cdn.simpleicons.org/facebook/ffffff" alt="Facebook" onclick="shareTo('facebook','${title}')">
-   <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="Instagram" onclick="shareTo('instagram','${title}')">
-   <img src="https://cdn.simpleicons.org/tiktok/ffffff" alt="TikTok" onclick="shareTo('tiktok','${title}')">
-   <button class="download-btn" onclick="downloadPromo()">Download</button>
-  </div>
- </div>`
- document.body.appendChild(overlay)
-}
-
-function createSong(s,rank){
- let div=document.createElement("div")
- div.className="song"
- div.innerHTML=`
- <div class="rank">${rank}</div>
- <img src="images/${s.ImageFile}" alt="${s.Song}">
- <div class="info">
-  ${s.Song}
-  <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
-  <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-  <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
- </div>
- ${shareSVG()}
- `
- div.querySelector("svg").onclick=()=>openPromo(s.Song,"",s.Shazams,"images/"+s.ImageFile)
- return div
-}
-
-function createSection(name,list){
- let div=document.createElement("div")
- div.className="section"
- let total=list.reduce((a,b)=>a+b.Shazams,0)
- let promoImage=sectionImage(name)
-
- div.innerHTML=`
- <div class="section-bg" style="background-image:url('${promoImage}')"></div>
- <div class="section-content">
-  <h2>${name} ${shareSVG()}</h2>
- </div>`
-
- div.querySelector("svg").onclick=()=>openPromo(name,"",total,promoImage,list)
-
- let content=div.querySelector(".section-content")
- list.forEach((s,i)=>{
-  if(name === "GLOBAL TOP 10") {
-   content.appendChild(createSong(s,i+1))
-  } else {
-   let songDiv = createSong(s,i+1)
-   songDiv.querySelector(".rank").remove()
-   content.appendChild(songDiv)
-  }
- })
- return div
-}
-
-function sectionImage(name){
- const map={
-  "GLOBAL TOP 10":"images/ot4.jpg",
-  "DEADLINE":"images/deadline2.png",
-  "BORN PINK":"images/bornpink.jpg",
-  "THE ALBUM":"images/thealbum.jpg",
-  "KILL THIS LOVE - EP":"images/killthislove.jpg",
-  "SQUARE UP":"images/squareup.jpg",
-  "SQUARE TWO":"images/squaretwo.jpg",
-  "SQUARE ONE":"images/squareone.jpg",
-  "Others":"images/asifitsyourlast.jpg"
- }
- return map[name]||"images/ot4.jpg"
-}
-
-function checkMilestones(){
- let reached=[]
- songs.forEach(s=>{
-  let current=lastMilestone(s.Shazams)
-  let prev=previousMilestones[s.Song]||0
-  console.log(s.Song, "current:", current, "prev:", prev)
-  if(current>prev && current>0){
-   reached.push(s)
-   previousMilestones[s.Song]=current
-  }
- })
- console.log("Reached:", reached.length)
- if(reached.length>0) showMilestonePopup(reached)
-}
-
-function build(){
- let c=document.getElementById("content")
- c.innerHTML=""
- let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
- c.appendChild(createSection("GLOBAL TOP 10",top))
- let sections=[...new Set(songs.map(s=>s.Section))]
- sections.forEach(sec=>{
-  if(sec!=="GLOBAL TOP 10")
-   c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
- })
- checkMilestones()
-}
-console.log("Script started")
-
-Papa.parse("blackpink.csv",{
- download:true,
- header:true,
- dynamicTyping:true,
- complete:function(res){
-  console.log("CSV parse complete")
-  console.log("Errors:", res.errors)
-  console.log("Data rows:", res.data.length)
-  songs=res.data.filter(s=>s.Song)
-  console.log("Filtered songs:", songs.length)
-  build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
- },
- error:function(err){
-  console.log("CSV parse error:", err)
- }
-})
-Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
- complete:function(res){
-  songs=res.data.filter(s=>s.Song)
-  build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
- }})
 </script>
-
-</body>
-</html>
