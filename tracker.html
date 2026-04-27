@@ -133,42 +133,44 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:rgba(0,0,0,0.9);
-  padding:10px 15px;
-  border-radius:14px;
+  background:rgba(0,0,0,0.95);
+  padding:15px 20px;
+  border-radius:16px;
   z-index:9999;
-  border:1px solid #ff2ea6;
+  border:2px solid #ff2ea6;
   text-align:center;
-  max-width:90%;
-  font-size:14px;
+  max-width:92%;
+  font-size:16px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:15px;
   flex-wrap:wrap;
   justify-content:center;
   position:relative;
+  box-shadow:0 0 30px rgba(255,46,166,0.5);
 }
 
 .milestone-popup b{
-  font-size:16px;
+  font-size:18px;
   margin:0;
 }
 
 .milestone-item{
   display:flex;
   align-items:center;
-  gap:5px;
-  padding:5px 10px;
-  border:1px solid rgba(255,46,166,0.3);
-  border-radius:6px;
-  font-size:14px;
+  gap:8px;
+  padding:8px 14px;
+  border:1px solid rgba(255,46,166,0.5);
+  border-radius:8px;
+  font-size:15px;
+  background:rgba(255,46,166,0.1);
 }
 
 .milestone-close-x{
   position:absolute;
-  top:5px;
-  right:8px;
-  font-size:18px;
+  top:8px;
+  right:12px;
+  font-size:20px;
   color:#ff2ea6;
   cursor:pointer;
 }
@@ -177,12 +179,12 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   position:fixed;
   pointer-events:none;
   z-index:10000;
-  width:60px;
-  height:60px;
+  width:50px;
+  height:50px;
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center;
-  opacity:1;
+  opacity:0.95;
 }
 </style>
 </head>
@@ -219,27 +221,26 @@ function milestoneText(v){
 }
 
 function launchConfetti(){
-  console.log("launchConfetti called");
-  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
-  for(let i=0;i<40;i++){
-   let c=document.createElement("div")
-   c.className="confetti-piece"
-   let img=images[Math.floor(Math.random()*images.length)]
-   c.style.backgroundImage=`url('${img}')`
-   if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
-   c.style.left=Math.random()*window.innerWidth+"px"
-   c.style.top="-60px"
-   c.style.opacity="1"
-   document.body.appendChild(c)
-   animateConfetti(c)
-   confettiActive.push(c)
-  }
+ const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
+ for(let i=0;i<50;i++){
+  let c=document.createElement("div")
+  c.className="confetti-piece"
+  let img=images[Math.floor(Math.random()*images.length)]
+  c.style.backgroundImage=`url('${img}')`
+  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
+  c.style.left=Math.random()*window.innerWidth+"px"
+  c.style.top="-60px"
+  c.style.opacity="0.95"
+  document.body.appendChild(c)
+  animateConfetti(c)
+  confettiActive.push(c)
+ }
 }
 
 function animateConfetti(el){
- let speed=1.5+Math.random()*2
+ let speed=4+Math.random()*3
  let rotation=Math.random()*360
- let rotationSpeed=Math.random()*8-4
+ let rotationSpeed=Math.random()*10-5
  let startTime=Date.now()
  
  function frame(){
@@ -248,8 +249,8 @@ function animateConfetti(el){
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
-  el.style.opacity=Math.max(0,1-(elapsed/15000))
-  if(top<window.innerHeight+80 && elapsed<35000){
+  el.style.opacity=Math.max(0,1-(elapsed/8000))
+  if(top<window.innerHeight+80 && elapsed<12000){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -260,6 +261,7 @@ function animateConfetti(el){
 
 function showMilestonePopup(list){
  if(!list.length) return
+ alert("MILESTONE DETECTED! Popup should appear.")
  console.log("SHOWING POPUP WITH", list.length, "milestones")
  launchConfetti()
  let pop=document.createElement("div")
@@ -268,17 +270,6 @@ function showMilestonePopup(list){
  document.body.appendChild(pop)
  console.log("Popup added to DOM")
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},35000)
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},10000)
 }
-
-async function exportImage(){
- let area=document.getElementById("exportArea")
- let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
- return new Promise(resolve=>canvas.toBlob(resolve))
-}
-
-async function nativeShare(title){
- let blob=await exportImage()
- let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
- if(navigator.canShare && navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
+</script>
