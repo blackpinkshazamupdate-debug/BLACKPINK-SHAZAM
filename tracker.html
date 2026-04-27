@@ -219,20 +219,21 @@ function milestoneText(v){
 }
 
 function launchConfetti(){
- const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
- for(let i=0;i<40;i++){
-  let c=document.createElement("div")
-  c.className="confetti-piece"
-  let img=images[Math.floor(Math.random()*images.length)]
-  c.style.backgroundImage=`url('${img}')`
-  if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
-  c.style.left=Math.random()*window.innerWidth+"px"
-  c.style.top="-60px"
-  c.style.opacity="1"
-  document.body.appendChild(c)
-  animateConfetti(c)
-  confettiActive.push(c)
- }
+  console.log("launchConfetti called");
+  const images=["images/lightstick1.png","images/lightstick2.png","images/bplogo.png"]
+  for(let i=0;i<40;i++){
+   let c=document.createElement("div")
+   c.className="confetti-piece"
+   let img=images[Math.floor(Math.random()*images.length)]
+   c.style.backgroundImage=`url('${img}')`
+   if(img.includes("bplogo")) c.style.filter="drop-shadow(0 0 25px #ff2ea6) drop-shadow(0 0 15px #ff2ea6)"
+   c.style.left=Math.random()*window.innerWidth+"px"
+   c.style.top="-60px"
+   c.style.opacity="1"
+   document.body.appendChild(c)
+   animateConfetti(c)
+   confettiActive.push(c)
+  }
 }
 
 function animateConfetti(el){
@@ -281,182 +282,3 @@ async function nativeShare(title){
  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
  if(navigator.canShare && navigator.canShare({files:[file]})){
    await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:title,url:location.href})
- } else {
-   downloadPromo()
- }
-}
-
-function shareTo(platform,title){
- let url=location.href
- if(platform==="x") window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent('Check out '+title+' on BLACKPINK Shazam Tracker!')}`,"_blank")
- if(platform==="facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,"_blank")
- if(platform==="instagram"||platform==="tiktok") nativeShare(title)
-}
-
-async function downloadPromo(){
- let blob=await exportImage()
- let a=document.createElement("a")
- a.href=URL.createObjectURL(blob)
- a.download="blackpink-tracker.png"
- a.click()
-}
-
-function shareSVG(){
- return `
- <svg class="share-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
-  <circle cx="18" cy="5" r="3"/>
-  <circle cx="6" cy="12" r="3"/>
-  <circle cx="18" cy="19" r="3"/>
-  <line x1="8.7" y1="13.4" x2="15.3" y2="17.6"/>
-  <line x1="15.3" y1="6.4" x2="8.7" y2="10.6"/>
- </svg>`
-}
-
-function openPromo(title,subtitle,shazams,img,list=null){
- let contentHTML=""
- if(list){
-  contentHTML+="<div style='text-align:left;margin-top:10px;'>"
-  list.forEach((s,i)=>{contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>`})
-  contentHTML+="</div>"
- }
-
- let overlay=document.createElement("div")
- overlay.className="overlay"
- overlay.innerHTML=`
- <div class="card">
-  <div class="close-x" onclick="this.closest('.overlay').remove()">✕</div>
-
-  <div id="exportArea" class="exportArea">
-   <img src="${img}" alt="${title}">
-   <h2 style="color:#ff2ea6">${title}</h2>
-   <p>${exact(shazams)} Shazams</p>
-   ${contentHTML}
-  </div>
-
-  <div class="socials">
-   <img src="https://cdn.simpleicons.org/x/ffffff" alt="X" onclick="shareTo('x','${title}')">
-   <img src="https://cdn.simpleicons.org/facebook/ffffff" alt="Facebook" onclick="shareTo('facebook','${title}')">
-   <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="Instagram" onclick="shareTo('instagram','${title}')">
-   <img src="https://cdn.simpleicons.org/tiktok/ffffff" alt="TikTok" onclick="shareTo('tiktok','${title}')">
-   <button class="download-btn" onclick="downloadPromo()">Download</button>
-  </div>
- </div>`
- document.body.appendChild(overlay)
-}
-
-function createSong(s,rank){
- let div=document.createElement("div")
- div.className="song"
- div.innerHTML=`
- <div class="rank">${rank}</div>
- <img src="images/${s.ImageFile}" alt="${s.Song}">
- <div class="info">
-  ${s.Song}
-  <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
-  <div class="bar"><span style="width:${progress(s.Shazams)}%"></span></div>
-  <div class="hoverstats">+${exact(s.Shazams-s.Previous)} • ${progress(s.Shazams)}% to ${milestoneText(nextMilestone(s.Shazams))}</div>
- </div>
- ${shareSVG()}
- `
- div.querySelector("svg").onclick=()=>openPromo(s.Song,"",s.Shazams,"images/"+s.ImageFile)
- return div
-}
-
-function createSection(name,list){
- let div=document.createElement("div")
- div.className="section"
- let total=list.reduce((a,b)=>a+b.Shazams,0)
- let promoImage=sectionImage(name)
-
- div.innerHTML=`
- <div class="section-bg" style="background-image:url('${promoImage}')"></div>
- <div class="section-content">
-  <h2>${name} ${shareSVG()}</h2>
- </div>`
-
- div.querySelector("svg").onclick=()=>openPromo(name,"",total,promoImage,list)
-
- let content=div.querySelector(".section-content")
- list.forEach((s,i)=>{
-  if(name === "GLOBAL TOP 10") {
-   content.appendChild(createSong(s,i+1))
-  } else {
-   let songDiv = createSong(s,i+1)
-   songDiv.querySelector(".rank").remove()
-   content.appendChild(songDiv)
-  }
- })
- return div
-}
-
-function sectionImage(name){
- const map={
-  "GLOBAL TOP 10":"images/ot4.jpg",
-  "DEADLINE":"images/deadline2.png",
-  "BORN PINK":"images/bornpink.jpg",
-  "THE ALBUM":"images/thealbum.jpg",
-  "KILL THIS LOVE - EP":"images/killthislove.jpg",
-  "SQUARE UP":"images/squareup.jpg",
-  "SQUARE TWO":"images/squaretwo.jpg",
-  "SQUARE ONE":"images/squareone.jpg",
-  "Others":"images/asifitsyourlast.jpg"
- }
- return map[name]||"images/ot4.jpg"
-}
-
-function checkMilestones(){
- let reached=[]
- songs.forEach(s=>{
-  let current=lastMilestone(s.Shazams)
-  let prev=previousMilestones[s.Song]||0
-  console.log(s.Song, "current:", current, "prev:", prev)
-  if(current>prev && current>0){
-   reached.push(s)
-   previousMilestones[s.Song]=current
-  }
- })
- console.log("Reached:", reached.length)
- if(reached.length>0) showMilestonePopup(reached)
-}
-
-function build(){
- let c=document.getElementById("content")
- c.innerHTML=""
- let top=[...songs].sort((a,b)=>b.Shazams-a.Shazams).slice(0,10)
- c.appendChild(createSection("GLOBAL TOP 10",top))
- let sections=[...new Set(songs.map(s=>s.Section))]
- sections.forEach(sec=>{
-  if(sec!=="GLOBAL TOP 10")
-   c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
- })
- checkMilestones()
-}
-console.log("Script started")
-
-Papa.parse("blackpink.csv",{
- download:true,
- header:true,
- dynamicTyping:true,
- complete:function(res){
-  console.log("CSV parse complete")
-  console.log("Errors:", res.errors)
-  console.log("Data rows:", res.data.length)
-  songs=res.data.filter(s=>s.Song)
-  console.log("Filtered songs:", songs.length)
-  build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
- },
- error:function(err){
-  console.log("CSV parse error:", err)
- }
-})
-Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
- complete:function(res){
-  songs=res.data.filter(s=>s.Song)
-  build()
-  document.getElementById("updated").innerText="Last Updated: "+songs["Last Update"]
- }})
-</script>
-
-</body>
-</html>
