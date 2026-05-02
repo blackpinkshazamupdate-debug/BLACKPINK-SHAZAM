@@ -142,6 +142,7 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   max-width:90%;
   font-size:14px;
   pointer-events:auto;
+  /* Ensures it stays visible and centered while scrolling */
 }
 
 .milestone-popup b{
@@ -246,10 +247,8 @@ function animateConfetti(el){
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
-  // Changed from 15000 to 30000 for longer duration
   el.style.opacity=Math.max(0,1-(elapsed/30000))
   
-  // Changed from 15000 to 30000 to match opacity fade
   if(top<window.innerHeight+80 && elapsed<30000){
    requestAnimationFrame(frame)
   } else {
@@ -269,7 +268,6 @@ function showMilestonePopup(list){
  "<br><button class='download-btn' onclick='this.parentNode.remove()'>Close</button>"
  document.body.appendChild(pop)
  
- // Changed from 15000 to 30000 to match confetti duration
  setTimeout(()=>{if(pop.parentNode) pop.remove()},30000)
 }
 
