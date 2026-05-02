@@ -246,9 +246,11 @@ function animateConfetti(el){
   rotation+=rotationSpeed
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
-  el.style.opacity=Math.max(0,1-(elapsed/15000))
+  // Changed from 15000 to 30000 for longer duration
+  el.style.opacity=Math.max(0,1-(elapsed/30000))
   
-  if(top<window.innerHeight+80 && elapsed<15000){
+  // Changed from 15000 to 30000 to match opacity fade
+  if(top<window.innerHeight+80 && elapsed<30000){
    requestAnimationFrame(frame)
   } else {
    el.remove()
@@ -267,7 +269,8 @@ function showMilestonePopup(list){
  "<br><button class='download-btn' onclick='this.parentNode.remove()'>Close</button>"
  document.body.appendChild(pop)
  
- setTimeout(()=>{if(pop.parentNode) pop.remove()},15000)
+ // Changed from 15000 to 30000 to match confetti duration
+ setTimeout(()=>{if(pop.parentNode) pop.remove()},30000)
 }
 
 async function exportImage(){
