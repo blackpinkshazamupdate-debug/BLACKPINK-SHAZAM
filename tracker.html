@@ -142,9 +142,11 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   max-width:90%;
   max-height:80vh;
   overflow-y:auto;
+  scrollbar-width:none;
   font-size:14px;
   pointer-events:auto;
 }
+.milestone-popup::-webkit-scrollbar{display:none;}
 
 .milestone-popup b{
   font-size:16px;
@@ -265,8 +267,7 @@ function showMilestonePopup(list){
  let pop=document.createElement("div")
  pop.className="milestone-popup"
  pop.innerHTML="<span class='milestone-close' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b><br><br>"+
- list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")+
- "<br><button class='download-btn' onclick='this.parentNode.remove()'>Close</button>"
+ list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
  
  setTimeout(()=>{if(pop.parentNode) pop.remove()},30000)
