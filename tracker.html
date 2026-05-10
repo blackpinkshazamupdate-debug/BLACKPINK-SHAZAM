@@ -101,7 +101,6 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   object-fit:contain;
   border-radius:10px;
   margin-bottom:10px;
-  max-height:220px;
 }
 
 .socials{
@@ -276,7 +275,13 @@ function showMilestonePopup(list){
 
 async function exportImage(){
  let area=document.getElementById("exportArea")
- let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2})
+ let canvas=await html2canvas(area,{
+  backgroundColor:"#000",
+  scale:2,
+  width:440,
+  windowWidth:440,
+  useCORS:true
+ })
  return new Promise(resolve=>canvas.toBlob(resolve))
 }
 
