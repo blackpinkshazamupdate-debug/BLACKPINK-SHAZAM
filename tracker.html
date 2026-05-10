@@ -74,6 +74,13 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .hoverstats{font-size:12px;opacity:0;transition:.2s;margin-top:5px;}
 .song:hover .hoverstats{opacity:1;}
 .song:hover .total-shazams{opacity:0.5;}
+.song.active .hoverstats{opacity:1;}
+.song.active .total-shazams{opacity:0.5;}
+
+@media(hover:none){
+  .song:hover .hoverstats{opacity:0;}
+  .song:hover .total-shazams{opacity:.7;}
+}
 
 .overlay{
   position:fixed;
@@ -473,7 +480,8 @@ function createSong(s,rank){
  </div>
  ${shareSVG()}
  `
- div.querySelector("svg").onclick=()=>openPromo(s.Song,"",s.Shazams,"images/"+s.ImageFile)
+ div.querySelector("svg").onclick=e=>{e.stopPropagation();openPromo(s.Song,"",s.Shazams,"images/"+s.ImageFile)}
+ div.addEventListener("click",()=>div.classList.toggle("active"))
  return div
 }
 
@@ -549,7 +557,7 @@ Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
  complete:function(res){
   songs=res.data.filter(s=>s.Song)
   build()
-  let lastUpdate = songs && songs["Last Update"] ? songs["Last Update"] : "Unknown"
+  let lastUpdate = songs.length && songs[0]["Last Update"] ? songs[0]["Last Update"] : "Unknown"
   document.getElementById("updated").innerText="Last Updated: "+lastUpdate
  }})
 </script>
