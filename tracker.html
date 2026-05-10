@@ -77,11 +77,6 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .song.active .hoverstats{opacity:1;}
 .song.active .total-shazams{opacity:0.5;}
 
-@media(hover:none){
-  .song:hover .hoverstats{opacity:0;}
-  .song:hover .total-shazams{opacity:.7;}
-}
-
 .overlay{
   position:fixed;
   inset:0;
@@ -93,7 +88,8 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   padding:20px;
 }
 
-/* Mobile styles */
+body.no-hover .song:hover .hoverstats{opacity:0;}
+body.no-hover .song:hover .total-shazams{opacity:.7;}
 @media(max-width:600px){
   header{font-size:24px;padding:20px 10px;}
   .section-content{padding:15px;}
@@ -551,6 +547,11 @@ function build(){
    c.appendChild(createSection(sec,songs.filter(x=>x.Section===sec)))
  })
  checkMilestones()
+}
+
+// disable hover stats on touch devices, use click instead
+if('ontouchstart' in window || navigator.maxTouchPoints>0){
+ document.body.classList.add('no-hover')
 }
 
 Papa.parse("blackpink.csv",{download:true,header:true,dynamicTyping:true,
