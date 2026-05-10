@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>BLACKPINK Shazam Tracker</title>
+<meta property="og:title" content="BLACKPINK Shazam Tracker">
+<meta property="og:description" content="Track BLACKPINK Shazam counts across all songs!">
+<meta property="og:image" content="https://blackpinkshazamupdate-debug.github.io/BLACKPINK-SHAZAM/images/ot4.jpg">
+<meta property="og:url" content="https://blackpinkshazamupdate-debug.github.io/BLACKPINK-SHAZAM/tracker.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BLACKPINK Shazam Tracker">
+<meta name="twitter:description" content="Track BLACKPINK Shazam counts across all songs!">
+<meta name="twitter:image" content="https://blackpinkshazamupdate-debug.github.io/BLACKPINK-SHAZAM/images/ot4.jpg">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -326,11 +335,21 @@ async function nativeShare(title){
  }
 }
 
-function shareTo(platform,title){
+async function shareTo(platform,title){
  let url=location.href
- if(platform==="x") window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent('Check out '+title+' on BLACKPINK Shazam Tracker!')}`,"_blank")
+ let text='Check out '+title+' on BLACKPINK Shazam Tracker!'
+ try{
+  let blob=await exportImage()
+  let file=new File([blob],"blackpink-"+title+".png",{type:"image/png"})
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+   await navigator.share({files:[file],title:"BLACKPINK Shazam Tracker",text:text,url:url})
+   return
+  }
+ }catch(e){}
+ // fallback to platform-specific URL share
+ if(platform==="x") window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,"_blank")
  if(platform==="facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,"_blank")
- if(platform==="instagram"||platform==="tiktok") nativeShare(title)
+ if(platform==="instagram"||platform==="tiktok") downloadPromo()
 }
 
 async function downloadPromo(){
