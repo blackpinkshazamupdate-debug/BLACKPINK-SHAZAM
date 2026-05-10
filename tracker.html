@@ -273,15 +273,26 @@ function showMilestonePopup(list){
  setTimeout(()=>{if(pop.parentNode) pop.remove()},30000)
 }
 
+async function toDataURL(url){
+ let res=await fetch(url)
+ let blob=await res.blob()
+ return new Promise(resolve=>{
+  let r=new FileReader()
+  r.onload=()=>resolve(r.result)
+  r.readAsDataURL(blob)
+ })
+}
+
 async function exportImage(){
  let area=document.getElementById("exportArea")
- let canvas=await html2canvas(area,{
-  backgroundColor:"#000",
-  scale:2,
-  width:440,
-  windowWidth:440,
-  useCORS:true
- })
+ let imgs=area.querySelectorAll("img")
+ let origSrcs=[]
+ for(let img of imgs){
+  origSrcs.push(img.src)
+  try{ img.src=await toDataURL(img.src) }catch(e){}
+ }
+ let canvas=await html2canvas(area,{backgroundColor:"#000",scale:2,useCORS:true})
+ imgs.forEach((img,i)=>img.src=origSrcs[i])
  return new Promise(resolve=>canvas.toBlob(resolve))
 }
 
