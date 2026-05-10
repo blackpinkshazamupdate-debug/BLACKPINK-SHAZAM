@@ -23,8 +23,64 @@
   src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");
 }
 
+*{box-sizing:border-box;}
+
 body{margin:0;background:black;color:white;font-family:"BPFont",sans-serif;position:relative;}
-header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background-color:#141414;
+  padding:30px 20px;
+  transition:left 0.3s ease;
+  z-index:1000;
+  overflow-y:auto;
+}
+.sidebar a{
+  display:block;
+  color:#f2f2f2;
+  text-decoration:none;
+  margin-bottom:20px;
+  font-weight:600;
+  font-size:1.05rem;
+  font-family:"BPFont",sans-serif;
+}
+.sidebar a:hover{color:#ff2ea6;}
+.sidebar.open{left:0;}
+
+.sidebar-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:999;
+}
+.sidebar-overlay.show{display:block;}
+
+/* HEADER */
+header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding:24px 20px;
+  font-size:34px;
+  color:#ff2ea6;
+}
+
+.menu-btn{
+  position:absolute;
+  left:20px;
+  font-size:28px;
+  cursor:pointer;
+  color:#ff2ea6;
+  line-height:1;
+}
+
 .updated{text-align:center;opacity:.7;margin-bottom:20px;}
 
 .section{margin:40px 0;position:relative;overflow:hidden;}
@@ -64,7 +120,6 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
 .song img{width:50px;height:50px;object-fit:cover;border-radius:6px;display:block;flex-shrink:0;}
 
 .info{flex:1;min-width:0;}
-
 .info .song-title{font-size:15px;word-break:break-word;}
 
 .bar{height:6px;background:#333;margin-top:6px;border-radius:5px;overflow:hidden;}
@@ -84,27 +139,12 @@ header{text-align:center;padding:30px;font-size:38px;color:#ff2ea6;}
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index:999;
+  z-index:1001;
   padding:20px;
 }
 
 body.no-hover .song:hover .hoverstats{opacity:0;}
 body.no-hover .song:hover .total-shazams{opacity:.7;}
-@media(max-width:600px){
-  header{font-size:24px;padding:20px 10px;}
-  .section-content{padding:15px;}
-  .section h2{font-size:20px;}
-  .song{gap:10px;padding:8px;}
-  .rank{font-size:16px;width:28px;}
-  .song img{width:40px;height:40px;}
-  .info .song-title{font-size:13px;}
-  .total-shazams{font-size:11px;}
-  .hoverstats{font-size:11px;}
-  .share-icon{width:16px;height:16px;}
-  .socials img{width:24px;}
-  .card{padding:12px;}
-  .milestone-popup{width:85%;}
-}
 
 .card{
   background:black;
@@ -131,25 +171,9 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   background:#000;
   border-radius:10px;
 }
-
-.exportArea img{
-  width:100%;
-  height:auto;
-  object-fit:cover;
-  border-radius:10px;
-  margin-bottom:10px;
-  display:block;
-}
-
-.exportArea h2{
-  text-align:center;
-  margin:8px 0;
-}
-
-.exportArea p{
-  text-align:center;
-  margin:4px 0;
-}
+.exportArea img{width:100%;height:auto;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block;}
+.exportArea h2{text-align:center;margin:8px 0;}
+.exportArea p{text-align:center;margin:4px 0;}
 
 .socials{
   display:flex;
@@ -158,12 +182,7 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   margin-top:15px;
   flex-wrap:wrap;
 }
-
-.socials img{
-  width:30px;
-  cursor:pointer;
-  transition:.2s;
-}
+.socials img{width:30px;cursor:pointer;transition:.2s;}
 .socials img:hover{transform:scale(1.2);}
 
 .download-btn{
@@ -194,12 +213,7 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   pointer-events:auto;
 }
 .milestone-popup::-webkit-scrollbar{display:none;}
-
-.milestone-popup b{
-  font-size:16px;
-  display:block;
-  margin-bottom:10px;
-}
+.milestone-popup b{font-size:16px;display:block;margin-bottom:10px;}
 
 .milestone-item{
   display:flex;
@@ -209,10 +223,7 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   padding:5px;
   border-bottom:1px solid rgba(255,46,166,0.3);
 }
-
-.milestone-item:last-child{
-  border-bottom:none;
-}
+.milestone-item:last-child{border-bottom:none;}
 
 .milestone-close{
   position:sticky;
@@ -236,9 +247,9 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   opacity:1;
 }
 
-/* ── DESKTOP (768px and up) ── */
+/* DESKTOP */
 @media(min-width:768px){
-  header{font-size:48px;padding:40px;}
+  header{font-size:42px;padding:30px 20px;}
   #content{max-width:900px;margin:0 auto;}
   .section-content{padding:40px;}
   .section h2{font-size:32px;}
@@ -246,14 +257,13 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   .song img{width:64px;height:64px;}
   .rank{font-size:22px;width:50px;}
   .info{font-size:16px;}
-  .hoverstats{opacity:0;}
-  .song:hover .hoverstats{opacity:1;}
   .card{width:480px;}
 }
 
-/* ── MOBILE (up to 767px) ── */
+/* MOBILE */
 @media(max-width:767px){
-  header{font-size:26px;padding:20px 10px;}
+  header{font-size:20px;padding:16px 10px 16px 50px;}
+  .menu-btn{font-size:22px;left:14px;}
   .updated{font-size:12px;}
   .section-content{padding:15px 10px;}
   .section h2{font-size:20px;}
@@ -262,9 +272,7 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
   .rank{font-size:16px;width:28px;}
   .info{font-size:13px;}
   .total-shazams{font-size:11px;}
-  /* on mobile show hoverstats always since there's no hover */
-  .hoverstats{opacity:1!important;font-size:11px;}
-  .total-shazams{opacity:.7!important;}
+  .hoverstats{font-size:11px;}
   .share-icon{width:18px;height:18px;}
   .card{width:95%;padding:14px;}
   .socials{gap:12px;}
@@ -276,11 +284,27 @@ body.no-hover .song:hover .total-shazams{opacity:.7;}
 
 <body>
 
-<header>BLACKPINK Shazam Tracker</header>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <a href="index.html">🏠 Home</a>
+  <a href="tutorials.html">📖 How to Shazam</a>
+  <a href="tracker.html">📊 Shazam Tracker</a>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+<header>
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  BLACKPINK Shazam Tracker
+</header>
 <div class="updated" id="updated"></div>
 <div id="content"></div>
 
 <script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("show");
+}
+
 let songs=[]
 let confettiActive=[]
 let previousMilestones={}
@@ -327,7 +351,6 @@ function animateConfetti(el){
  let rotation=Math.random()*360
  let rotationSpeed=Math.random()*8-4
  let startTime=Date.now()
- 
  function frame(){
   let elapsed=Date.now()-startTime
   let top=parseFloat(el.style.top)+speed
@@ -335,7 +358,6 @@ function animateConfetti(el){
   el.style.top=top+"px"
   el.style.transform=`rotate(${rotation}deg)`
   el.style.opacity=Math.max(0,1-(elapsed/30000))
-  
   if(top<window.innerHeight+80 && elapsed<30000){
    requestAnimationFrame(frame)
   } else {
@@ -353,7 +375,6 @@ function showMilestonePopup(list){
  pop.innerHTML="<span class='milestone-close' onclick='this.parentNode.remove()'>✕</span><b>🎉 Milestones reached!</b><br><br>"+
  list.map(s=>`<div class='milestone-item'><span style='color:#ff2ea6;font-weight:bold;'>${milestoneText(lastMilestone(s.Shazams))}</span> — ${s.Song}</div>`).join("")
  document.body.appendChild(pop)
- 
  setTimeout(()=>{if(pop.parentNode) pop.remove()},30000)
 }
 
@@ -405,7 +426,6 @@ async function shareTo(platform,title){
    return
   }
  }catch(e){}
- // fallback to platform-specific URL share
  if(platform==="x") window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,"_blank")
  if(platform==="facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,"_blank")
  if(platform==="instagram"||platform==="tiktok") downloadPromo()
@@ -437,20 +457,17 @@ function openPromo(title,subtitle,shazams,img,list=null){
   list.forEach((s,i)=>{contentHTML+=`${i+1}. ${s.Song} — ${exact(s.Shazams)}<br>`})
   contentHTML+="</div>"
  }
-
  let overlay=document.createElement("div")
  overlay.className="overlay"
  overlay.innerHTML=`
  <div class="card">
   <div class="close-x" onclick="this.closest('.overlay').remove()">✕</div>
-
   <div id="exportArea" class="exportArea">
    <img src="${img}" alt="${title}">
    <h2 style="color:#ff2ea6">${title}</h2>
    <p>${exact(shazams)} Shazams</p>
    ${contentHTML}
   </div>
-
   <div class="socials">
    <img src="https://cdn.simpleicons.org/x/ffffff" alt="X" onclick="shareTo('x','${title}')">
    <img src="https://cdn.simpleicons.org/facebook/ffffff" alt="Facebook" onclick="shareTo('facebook','${title}')">
@@ -486,15 +503,12 @@ function createSection(name,list){
  div.className="section"
  let total=list.reduce((a,b)=>a+b.Shazams,0)
  let promoImage=sectionImage(name)
-
  div.innerHTML=`
  <div class="section-bg" style="background-image:url('${promoImage}')"></div>
  <div class="section-content">
   <h2>${name} ${shareSVG()}</h2>
  </div>`
-
  div.querySelector("svg").onclick=()=>openPromo(name,"",total,promoImage,list)
-
  let content=div.querySelector(".section-content")
  list.forEach((s,i)=>{
   if(name === "GLOBAL TOP 10") {
@@ -549,7 +563,6 @@ function build(){
  checkMilestones()
 }
 
-// disable hover stats on touch devices, use click instead
 if('ontouchstart' in window || navigator.maxTouchPoints>0){
  document.body.classList.add('no-hover')
 }
