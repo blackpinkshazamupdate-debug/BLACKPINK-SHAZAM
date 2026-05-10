@@ -357,7 +357,7 @@ function createSong(s,rank){
  div.className="song"
  div.innerHTML=`
  <div class="rank">${rank}</div>
- <img src="images/${s.ImageFile}" alt="${s.Song}">
+ <img src="images/${s.ImageFile}" alt="${s.Song}" loading="eager">
  <div class="info">
   ${s.Song}
   <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
