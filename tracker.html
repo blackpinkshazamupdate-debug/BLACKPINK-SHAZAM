@@ -357,7 +357,7 @@ function createSong(s,rank){
  div.className="song"
  div.innerHTML=`
  <div class="rank">${rank}</div>
- <img src="images/${s.ImageFile}" alt="${s.Song}" loading="eager">
+ <img src="images/${s.ImageFile}" alt="${s.Song}" loading="eager" decoding="sync" onerror="console.error('FAILED TO LOAD: images/${s.ImageFile}', this.src)">
  <div class="info">
   ${s.Song}
   <div class="total-shazams">${exact(s.Shazams)} Shazams</div>
