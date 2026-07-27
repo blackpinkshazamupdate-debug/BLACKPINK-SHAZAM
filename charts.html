@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charts — BlinksUnited</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    @font-face{font-family:"BPFont";src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");}
+    *{box-sizing:border-box;}
+    body{margin:0;background:#0b0b0b;color:#f2f2f2;font-family:"BPFont","Poppins",sans-serif;}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;top:0;left:-260px;width:260px;height:100%;background:#141414;padding:30px 20px;transition:left .3s ease;z-index:1000;overflow-y:auto;}
+    .sidebar a{display:block;color:#f2f2f2;text-decoration:none;margin-bottom:20px;font-weight:600;font-size:1.05rem;}
+    .sidebar a:hover{color:#ff5fa2;}
+    .sidebar.open{left:0;}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;}
+    .overlay.show{display:block;}
+
+    /* HEADER */
+    header{display:flex;align-items:center;padding:16px 20px;}
+    .menu-btn{font-size:28px;cursor:pointer;color:#ff5fa2;}
+    h1{color:#ff5fa2;font-size:2rem;letter-spacing:2px;text-align:center;margin:30px 0 8px;}
+    .subtitle{text-align:center;color:#aaa;font-size:.95rem;margin-bottom:40px;}
+
+    /* GRID */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:900px;margin:0 auto;padding:0 20px 60px;}
+
+    .card{
+      background:#1a1a1a;
+      border:1px solid #2a2a2a;
+      border-radius:16px;
+      padding:28px 24px;
+      text-decoration:none;
+      color:#f2f2f2;
+      display:flex;flex-direction:column;align-items:flex-start;
+      transition:border-color .2s,transform .2s;
+    }
+    .card:hover{border-color:#ff5fa2;transform:translateY(-3px);}
+
+    .card-icon{font-size:2.2rem;margin-bottom:12px;}
+    .card-title{font-size:1.15rem;font-weight:700;color:#ff5fa2;margin-bottom:6px;}
+    .card-desc{font-size:.88rem;color:#bbb;line-height:1.55;}
+    .card-badge{margin-top:14px;background:#ff5fa2;color:#0b0b0b;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+    .card-soon{margin-top:14px;background:#2a2a2a;color:#777;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:20px;}
+
+    @media(max-width:600px){h1{font-size:1.5rem;}.grid{padding:0 16px 40px;}.card{padding:22px 18px;}}
+  </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <a href="index.html">🏠 Home</a>
+  <a href="tutorials.html">📖 How to Shazam</a>
+  <a href="blackpink.html">🖤 Shazam Tracker</a>
+  <a href="charts.html" style="color:#ff5fa2;">📊 Charts</a>
+  <a href="jisoo.html">💙 JISOO</a>
+  <a href="jennie.html">❤️ JENNIE</a>
+  <a href="rosé.html">🌸 ROSÉ</a>
+  <a href="lisa.html">💛 LISA</a>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<header><span class="menu-btn" onclick="toggleMenu()">☰</span></header>
+
+<h1>📊 Charts</h1>
+<p class="subtitle">BLACKPINK chart positions updated daily</p>
+
+<div class="grid">
+  <a class="card" href="apple-music.html">
+    <div class="card-icon">🎵</div>
+    <div class="card-title">Apple Music</div>
+    <div class="card-desc">Global Top 100 + per-country chart positions across 41 storefronts. Updated daily at 08:30 UTC.</div>
+    <div class="card-badge">Live</div>
+  </a>
+
+  <div class="card" style="cursor:default;">
+    <div class="card-icon">🎵</div>
+    <div class="card-title">Shazam</div>
+    <div class="card-desc">Global and country-level Shazam chart positions for BLACKPINK and solo members.</div>
+    <div class="card-soon">Coming soon</div>
+  </div>
+
+  <div class="card" style="cursor:default;">
+    <div class="card-icon">🎵</div>
+    <div class="card-title">Spotify</div>
+    <div class="card-desc">Daily and weekly Spotify chart tracking across global and country charts.</div>
+    <div class="card-soon">Coming soon</div>
+  </div>
+</div>
+
+<script>
+  function toggleMenu(){
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
+  }
+</script>
+</body>
+</html>

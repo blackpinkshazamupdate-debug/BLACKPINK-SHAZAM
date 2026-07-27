@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Music Charts — BlinksUnited</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    @font-face{font-family:"BPFont";src:url("fonts/ZEN-SERIF-TTF-Regular.ttf") format("truetype");}
+    *{box-sizing:border-box;}
+    body{margin:0;background:#0b0b0b;color:#f2f2f2;font-family:"BPFont","Poppins",sans-serif;}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;top:0;left:-260px;width:260px;height:100%;background:#141414;padding:30px 20px;transition:left .3s ease;z-index:1000;overflow-y:auto;}
+    .sidebar a{display:block;color:#f2f2f2;text-decoration:none;margin-bottom:20px;font-weight:600;font-size:1.05rem;}
+    .sidebar a:hover{color:#ff5fa2;}
+    .sidebar.open{left:0;}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;}
+    .overlay.show{display:block;}
+
+    /* HEADER */
+    header{display:flex;align-items:center;padding:16px 20px;}
+    .menu-btn{font-size:28px;cursor:pointer;color:#ff5fa2;}
+
+    .page-header{text-align:center;padding:20px 20px 0;}
+    .page-header h1{color:#ff5fa2;font-size:2rem;letter-spacing:2px;margin:0 0 6px;}
+    .page-header .meta{color:#888;font-size:.85rem;margin-bottom:28px;}
+
+    /* TABS */
+    .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:30px;padding:0 20px;}
+    .tab{background:#1a1a1a;border:1px solid #333;color:#ccc;padding:10px 24px;border-radius:30px;cursor:pointer;font-size:.9rem;font-family:inherit;transition:all .2s;}
+    .tab.active{background:#ff5fa2;border-color:#ff5fa2;color:#0b0b0b;font-weight:700;}
+    .tab:hover:not(.active){border-color:#ff5fa2;color:#ff5fa2;}
+
+    /* SECTION */
+    .section{display:none;max-width:900px;margin:0 auto;padding:0 20px 60px;}
+    .section.active{display:block;}
+
+    /* LOADING / ERROR */
+    .status{text-align:center;color:#888;padding:40px 20px;font-size:.95rem;}
+    .status.error{color:#e05;}
+
+    /* GLOBAL — BP highlights */
+    .bp-hits{margin-bottom:32px;}
+    .bp-hits h2{color:#ff5fa2;font-size:1.2rem;letter-spacing:1px;margin-bottom:14px;}
+    .bp-none{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px;color:#888;font-size:.9rem;text-align:center;}
+
+    .hit-card{
+      display:flex;align-items:center;gap:14px;
+      background:#1a1a1a;border:1px solid #ff5fa2;border-radius:12px;
+      padding:14px 16px;margin-bottom:10px;
+    }
+    .hit-rank{font-size:1.6rem;font-weight:800;color:#ff5fa2;min-width:48px;text-align:center;}
+    .hit-art{width:48px;height:48px;border-radius:8px;object-fit:cover;background:#2a2a2a;flex-shrink:0;}
+    .hit-art-placeholder{width:48px;height:48px;border-radius:8px;background:#2a2a2a;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+    .hit-info{flex:1;min-width:0;}
+    .hit-title{font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .hit-artist{color:#ff8fc7;font-size:.82rem;margin-top:2px;}
+    .hit-member{background:#ff5fa2;color:#0b0b0b;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+
+    /* FULL CHART (global) */
+    .chart-toggle{
+      background:none;border:1px solid #333;color:#aaa;font-family:inherit;font-size:.85rem;
+      padding:8px 18px;border-radius:20px;cursor:pointer;margin-bottom:16px;display:block;margin:0 auto 20px;
+    }
+    .chart-toggle:hover{border-color:#ff5fa2;color:#ff5fa2;}
+    .full-chart{display:none;}
+    .full-chart.open{display:block;}
+    .chart-row{
+      display:flex;align-items:center;gap:12px;padding:8px 0;
+      border-bottom:1px solid #1e1e1e;
+    }
+    .chart-row:last-child{border-bottom:none;}
+    .chart-row.bp{background:#1a0a10;border-radius:8px;padding:8px 10px;border-bottom:none;margin-bottom:2px;}
+    .c-rank{min-width:36px;color:#666;font-size:.85rem;text-align:right;}
+    .c-art{width:36px;height:36px;border-radius:6px;object-fit:cover;background:#1e1e1e;flex-shrink:0;}
+    .c-art-ph{width:36px;height:36px;border-radius:6px;background:#1e1e1e;flex-shrink:0;}
+    .c-title{flex:1;min-width:0;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .c-artist{font-size:.78rem;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .c-bp-dot{width:8px;height:8px;border-radius:50%;background:#ff5fa2;flex-shrink:0;}
+
+    /* PER-COUNTRY */
+    .date-line{color:#888;font-size:.85rem;margin-bottom:20px;}
+    .summary-bar{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;gap:24px;flex-wrap:wrap;}
+    .stat{text-align:center;}
+    .stat-n{font-size:1.6rem;font-weight:800;color:#ff5fa2;}
+    .stat-l{font-size:.75rem;color:#888;margin-top:2px;}
+
+    .regions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+
+    .region-card{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:14px 16px;}
+    .region-card.has-hits{border-color:#ff5fa2;background:#1a0a10;}
+    .region-name{font-size:.88rem;font-weight:700;color:#f2f2f2;margin-bottom:8px;}
+    .region-hit{display:flex;align-items:center;gap:8px;margin-top:6px;}
+    .region-pos{font-size:1.1rem;font-weight:800;color:#ff5fa2;min-width:32px;}
+    .region-track{font-size:.8rem;color:#eee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .region-artist{font-size:.75rem;color:#ff8fc7;}
+    .region-empty{font-size:.78rem;color:#444;}
+
+    @media(max-width:600px){
+      .page-header h1{font-size:1.4rem;}
+      .tabs{gap:6px;}
+      .tab{padding:8px 16px;font-size:.82rem;}
+      .hit-rank{font-size:1.2rem;min-width:38px;}
+      .regions-grid{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <a href="index.html">🏠 Home</a>
+  <a href="tutorials.html">📖 How to Shazam</a>
+  <a href="blackpink.html">🖤 Shazam Tracker</a>
+  <a href="charts.html">📊 Charts</a>
+  <a href="jisoo.html">💙 JISOO</a>
+  <a href="jennie.html">❤️ JENNIE</a>
+  <a href="rosé.html">🌸 ROSÉ</a>
+  <a href="lisa.html">💛 LISA</a>
+</div>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<header><span class="menu-btn" onclick="toggleMenu()">☰</span></header>
+
+<div class="page-header">
+  <h1>🎵 Apple Music Charts</h1>
+  <div class="meta" id="metaLine">Loading…</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('global',this)">🌍 Global Top 100</button>
+  <button class="tab" onclick="switchTab('country',this)">🌏 Per Country</button>
+</div>
+
+<!-- GLOBAL SECTION -->
+<div class="section active" id="sec-global">
+  <div id="globalContent" class="status">Loading chart data…</div>
+</div>
+
+<!-- PER-COUNTRY SECTION -->
+<div class="section" id="sec-country">
+  <div id="countryContent" class="status">Loading chart data…</div>
+</div>
+
+<script>
+const GLOBAL_URL  = 'https://raw.githubusercontent.com/altroindirizzoaltracorsa-hash/BLACKPINK-PROJECT-/main/data/apple-global-chart-latest.json';
+const COUNTRY_URL = 'https://raw.githubusercontent.com/altroindirizzoaltracorsa-hash/BLACKPINK-PROJECT-/main/data/apple-chart-positions-latest.json';
+
+const FLAG = {
+  us:'🇺🇸',gb:'🇬🇧',kr:'🇰🇷',jp:'🇯🇵',au:'🇦🇺',ca:'🇨🇦',de:'🇩🇪',fr:'🇫🇷',
+  it:'🇮🇹',es:'🇪🇸',br:'🇧🇷',mx:'🇲🇽',tw:'🇹🇼',hk:'🇭🇰',sg:'🇸🇬',ph:'🇵🇭',
+  th:'🇹🇭',id:'🇮🇩',my:'🇲🇾',vn:'🇻🇳',in:'🇮🇳',nz:'🇳🇿',nl:'🇳🇱',se:'🇸🇪',
+  no:'🇳🇴',pl:'🇵🇱',tr:'🇹🇷',ar:'🇦🇷',cl:'🇨🇱',co:'🇨🇴',pe:'🇵🇪',sa:'🇸🇦',
+  za:'🇿🇦',be:'🇧🇪',at:'🇦🇹',ch:'🇨🇭',pt:'🇵🇹',fi:'🇫🇮',dk:'🇩🇰',ie:'🇮🇪',cn:'🇨🇳',
+};
+
+function art(url, size=36) {
+  if (!url) return `<div class="c-art-ph" style="width:${size}px;height:${size}px;"></div>`;
+  return `<img class="c-art" src="${url}" width="${size}" height="${size}" loading="lazy" onerror="this.style.display='none'" alt="">`;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'});
+}
+
+/* ─── GLOBAL ─── */
+async function loadGlobal() {
+  const el = document.getElementById('globalContent');
+  try {
+    const res = await fetch(GLOBAL_URL + '?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+
+    document.getElementById('metaLine').textContent =
+      `Updated ${fmtDate(d.generatedAt)} · ${d.totalTracks} tracks`;
+
+    const bpHits = d.bpHits ?? d.tracks?.filter(t => t.isBlackpink) ?? [];
+    let html = `<div class="bp-hits"><h2>💖 BLACKPINK in Global Top 100</h2>`;
+
+    if (bpHits.length === 0) {
+      html += `<div class="bp-none">No BLACKPINK or solo entries in the Global Top 100 today.</div>`;
+    } else {
+      bpHits.forEach(h => {
+        const artHtml = h.artworkUrl
+          ? `<img class="hit-art" src="${h.artworkUrl}" loading="lazy" onerror="this.style.display='none'" alt="">`
+          : `<div class="hit-art-placeholder">🎵</div>`;
+        html += `<div class="hit-card">
+          <div class="hit-rank">#${h.position}</div>
+          ${artHtml}
+          <div class="hit-info">
+            <div class="hit-title">${esc(h.name)}</div>
+            <div class="hit-artist">${esc(h.artists)}</div>
+          </div>
+          <div class="hit-member">${esc(h.member ?? 'BP')}</div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+
+    // Full chart toggle
+    html += `<button class="chart-toggle" onclick="toggleChart(this)">▾ Show full Top 100</button>`;
+    html += `<div class="full-chart" id="fullChart">`;
+    (d.tracks ?? []).forEach(t => {
+      const isBP = t.isBlackpink;
+      html += `<div class="chart-row${isBP?' bp':''}">
+        <span class="c-rank">${t.position}</span>
+        ${art(t.artworkUrl)}
+        <div style="flex:1;min-width:0;">
+          <div class="c-title">${esc(t.name)}</div>
+          <div class="c-artist">${esc(t.artists)}</div>
+        </div>
+        ${isBP ? '<div class="c-bp-dot"></div>' : ''}
+      </div>`;
+    });
+    html += `</div>`;
+
+    el.className = '';
+    el.innerHTML = html;
+  } catch(e) {
+    el.className = 'status error';
+    el.textContent = 'Could not load Global chart data. Try again later.';
+  }
+}
+
+function toggleChart(btn) {
+  const fc = document.getElementById('fullChart');
+  fc.classList.toggle('open');
+  btn.textContent = fc.classList.contains('open') ? '▴ Hide full Top 100' : '▾ Show full Top 100';
+}
+
+/* ─── PER-COUNTRY ─── */
+async function loadCountry() {
+  const el = document.getElementById('countryContent');
+  try {
+    const res = await fetch(COUNTRY_URL + '?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+
+    const regions = d.regions ?? {};
+    const entries = Object.values(regions);
+    const totalHits = d.summary?.totalHits ?? entries.reduce((n,r)=>n+(r.hits?.length??0),0);
+    const hitsRegions = entries.filter(r => r.hits?.length > 0).length;
+
+    let html = `<div class="date-line">Updated ${fmtDate(d.generatedAt)}</div>`;
+    html += `<div class="summary-bar">
+      <div class="stat"><div class="stat-n">${totalHits}</div><div class="stat-l">Total chart entries</div></div>
+      <div class="stat"><div class="stat-n">${hitsRegions}</div><div class="stat-l">Countries charting</div></div>
+      <div class="stat"><div class="stat-n">${entries.length}</div><div class="stat-l">Countries tracked</div></div>
+    </div>`;
+
+    if (entries.length === 0) {
+      html += `<div class="status">No region data available yet.</div>`;
+      el.className = '';
+      el.innerHTML = html;
+      return;
+    }
+
+    // Sort: countries with hits first, then alphabetically
+    entries.sort((a,b) => {
+      const ah = a.hits?.length > 0 ? 0 : 1;
+      const bh = b.hits?.length > 0 ? 0 : 1;
+      return ah - bh || a.region.localeCompare(b.region);
+    });
+
+    html += `<div class="regions-grid">`;
+    entries.forEach(r => {
+      const hits = r.hits ?? [];
+      const hasHits = hits.length > 0;
+      const flag = FLAG[r.cc] ?? '🌐';
+      html += `<div class="region-card${hasHits?' has-hits':''}">
+        <div class="region-name">${flag} ${esc(r.region)}</div>`;
+      if (hasHits) {
+        hits.forEach(h => {
+          html += `<div class="region-hit">
+            <div class="region-pos">#${h.position}</div>
+            <div style="min-width:0;">
+              <div class="region-track">${esc(h.name)}</div>
+              <div class="region-artist">${esc(h.artists)}</div>
+            </div>
+          </div>`;
+        });
+      } else {
+        html += `<div class="region-empty">No entries today</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    el.className = '';
+    el.innerHTML = html;
+  } catch(e) {
+    el.className = 'status error';
+    el.textContent = 'Could not load per-country chart data. Try again later.';
+  }
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+}
+
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+}
+
+loadGlobal();
+loadCountry();
+</script>
+</body>
+</html>
